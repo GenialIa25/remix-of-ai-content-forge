@@ -13,43 +13,41 @@ export default function Header() {
   const isMobile = useIsMobile();
 
   return (
-    <header className="h-14 flex items-center justify-between px-4 shrink-0">
+    <header className="h-12 flex items-center justify-between px-4 shrink-0">
       <div className="flex items-center gap-2">
         {!sidebarOpen && (
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-lg hover:bg-secondary transition-colors mr-1"
+            className="p-2 rounded-lg hover:bg-secondary transition-colors"
             aria-label="Abrir sidebar"
           >
-            {isMobile ? <Menu className="w-4 h-4 text-muted-foreground" /> : <PanelLeft className="w-4 h-4 text-muted-foreground" />}
+            {isMobile ? <Menu className="w-[18px] h-[18px] text-muted-foreground" /> : <PanelLeft className="w-[18px] h-[18px] text-muted-foreground" />}
           </button>
         )}
-        {/* Mobile hamburger when sidebar closed */}
-        {isMobile && sidebarOpen === false && null}
-        
+
         <div className="relative">
           <button
             onClick={() => setModelDropdown(!modelDropdown)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-secondary transition-colors"
+            className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-secondary transition-colors"
             aria-label="Selecionar modelo"
           >
             <span className="text-base font-semibold text-foreground truncate max-w-[150px] sm:max-w-none">
               {agent?.name || 'Chat'}
             </span>
-            <ChevronDown className="w-3 h-3 text-muted-foreground" />
+            {/* Model name in GRAY, not green */}
+            {currentModel && (
+              <span className="text-sm text-muted-foreground hidden sm:inline">
+                {currentModel.name}
+              </span>
+            )}
+            <ChevronDown className="w-4 h-4 text-muted-foreground" />
           </button>
-
-          {currentModel && (
-            <span className="ml-1 text-sm font-medium text-primary hidden sm:inline">
-              {currentModel.name}
-            </span>
-          )}
 
           {modelDropdown && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setModelDropdown(false)} />
-              <div className="absolute top-full left-0 mt-1 z-50 bg-popover rounded-xl shadow-lg border border-border-secondary min-w-[220px] p-2">
-                <p className="px-3 py-1.5 text-xs text-muted-foreground font-medium uppercase tracking-wide">Modelo</p>
+              <div className="absolute top-full left-0 mt-1 z-50 bg-popover rounded-xl shadow-lg border border-border min-w-[220px] p-2">
+                <p className="px-3 py-1.5 text-xs text-muted-foreground font-medium">Modelo</p>
                 {AI_MODELS.map((model) => (
                   <button
                     key={model.id}
@@ -59,7 +57,7 @@ export default function Header() {
                     }`}
                   >
                     <span>{model.name}</span>
-                    {model.badge && <span className="text-xs text-primary">{model.badge}</span>}
+                    {model.badge && <span className="text-xs text-muted-foreground">{model.badge}</span>}
                   </button>
                 ))}
               </div>
@@ -68,15 +66,15 @@ export default function Header() {
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
+      {/* Right side - icon buttons only, no bordered "Compartilhar" */}
+      <div className="flex items-center gap-1">
         {!isMobile && (
-          <button className="flex items-center gap-2 px-4 py-2 rounded-full border border-border-secondary text-sm text-foreground hover:bg-secondary transition-colors" aria-label="Compartilhar">
-            <Share className="w-4 h-4" />
-            <span>Compartilhar</span>
+          <button className="p-2 rounded-lg hover:bg-secondary transition-colors" aria-label="Compartilhar">
+            <Share className="w-[18px] h-[18px] text-muted-foreground" />
           </button>
         )}
         <button className="p-2 rounded-lg hover:bg-secondary transition-colors" aria-label="Mais opções">
-          <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
+          <MoreHorizontal className="w-[18px] h-[18px] text-muted-foreground" />
         </button>
       </div>
     </header>

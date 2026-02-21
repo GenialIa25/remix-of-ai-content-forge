@@ -73,7 +73,7 @@ export default function ChatInput({ onSend, isStreaming, onStop }: Props) {
 
   return (
     <div className="px-4 pb-6 pt-2 w-full max-w-3xl mx-auto pb-[env(safe-area-inset-bottom,24px)]">
-      <div className="bg-secondary border border-border-secondary rounded-3xl px-4 py-3 flex items-end gap-2 focus-within:border-[hsl(var(--border-focus))] transition-colors">
+      <div className="bg-secondary border border-border rounded-3xl px-4 py-3 flex items-end gap-2 focus-within:border-muted-foreground/40 transition-colors">
         <button className="p-1.5 rounded-lg hover:bg-accent transition-colors shrink-0 mb-0.5" aria-label="Anexar arquivo">
           <Plus className="w-5 h-5 text-muted-foreground" />
         </button>
@@ -90,14 +90,14 @@ export default function ChatInput({ onSend, isStreaming, onStop }: Props) {
         />
 
         <div className="flex items-center gap-1 shrink-0 mb-0.5">
-          {/* Think button with dropdown */}
+          {/* Think button - GRAY, not green */}
           <div className="relative">
             <button
               onClick={() => setThinkDropdown(!thinkDropdown)}
               className={`p-1.5 rounded-full border text-sm flex items-center gap-1.5 transition-colors ${
                 thinkingMode
-                  ? 'border-primary text-primary'
-                  : 'border-border-secondary text-muted-foreground'
+                  ? 'border-muted-foreground/40 text-muted-foreground'
+                  : 'border-border text-muted-foreground'
               } hover:bg-accent`}
               aria-label="Modo de raciocínio"
             >
@@ -109,14 +109,14 @@ export default function ChatInput({ onSend, isStreaming, onStop }: Props) {
             {thinkDropdown && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setThinkDropdown(false)} />
-                <div className="absolute bottom-full right-0 mb-2 z-50 bg-popover rounded-xl shadow-lg border border-border-secondary min-w-[220px] p-2">
+                <div className="absolute bottom-full right-0 mb-2 z-50 bg-popover rounded-xl shadow-lg border border-border min-w-[220px] p-2">
                   <button
                     onClick={() => { setThinkingMode(true); setThinkDropdown(false); }}
                     className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left hover:bg-secondary transition-colors"
                   >
                     <div className="flex-1">
                       <p className="text-sm text-foreground font-medium flex items-center gap-2">
-                        {thinkingMode && <Check className="w-3.5 h-3.5 text-primary" />}
+                        {thinkingMode && <Check className="w-3.5 h-3.5 text-muted-foreground" />}
                         Pensar
                       </p>
                       <p className="text-xs text-muted-foreground">Raciocínio estendido</p>
@@ -128,7 +128,7 @@ export default function ChatInput({ onSend, isStreaming, onStop }: Props) {
                   >
                     <div className="flex-1">
                       <p className="text-sm text-foreground font-medium flex items-center gap-2">
-                        {!thinkingMode && <Check className="w-3.5 h-3.5 text-primary" />}
+                        {!thinkingMode && <Check className="w-3.5 h-3.5 text-muted-foreground" />}
                         Resposta rápida
                       </p>
                       <p className="text-xs text-muted-foreground">Sem raciocínio visível</p>
