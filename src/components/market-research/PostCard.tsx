@@ -32,6 +32,9 @@ export default function PostCard({ post, onClick }: PostCardProps) {
           alt={post.caption.slice(0, 50)}
           className="w-full h-full object-cover"
           loading="lazy"
+          referrerPolicy="no-referrer"
+          crossOrigin="anonymous"
+          onError={(e) => { e.currentTarget.style.display = 'none'; }}
         />
         <span className="absolute bottom-2 right-2 bg-background/80 backdrop-blur-sm text-foreground text-[10px] font-medium px-1.5 py-0.5 rounded">
           {typeBadge[post.type] || post.type}
