@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect, KeyboardEvent } from 'react';
-import { Mic, ArrowUp, Square, Brain, ChevronDown, Check } from 'lucide-react';
+import { ArrowUp, Square, Brain, ChevronDown, Check } from 'lucide-react';
 import { useChatStore } from '@/stores/chatStore';
 import { FileUploadButton, AttachedFiles, UploadedFile } from '@/components/chat/FileUploadButton';
+import { VoiceInputButton } from '@/components/chat/VoiceInputButton';
 
 interface Props {
   onSend: (message: string) => void;
@@ -12,10 +13,8 @@ interface Props {
 export default function ChatInput({ onSend, isStreaming, onStop }: Props) {
   const [value, setValue] = useState('');
   const [thinkDropdown, setThinkDropdown] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<UploadedFile[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const recognitionRef = useRef<any>(null);
   const { thinkingMode, setThinkingMode } = useChatStore();
 
   useEffect(() => {
@@ -40,38 +39,8 @@ export default function ChatInput({ onSend, isStreaming, onStop }: Props) {
     }
   };
 
-  const toggleRecording = () => {
-    if (isRecording) {
-      recognitionRef.current?.stop();
-      setIsRecording(false);
-      return;
-    }
-
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      alert('Seu navegador não suporta reconhecimento de voz.');
-      return;
-    }
-
-    const recognition = new SpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = 'pt-BR';
-
-    recognition.onresult = (event: any) => {
-      let transcript = '';
-      for (let i = 0; i < event.results.length; i++) {
-        transcript += event.results[i][0].transcript;
-      }
-      setValue(transcript);
-    };
-
-    recognition.onerror = () => setIsRecording(false);
-    recognition.onend = () => setIsRecording(false);
-
-    recognition.start();
-    recognitionRef.current = recognition;
-    setIsRecording(true);
+  const handleVoiceTranscript = (text: string) => {
+    setValue((prev) => prev + (prev ? ' ' : '') + text);
   };
 
   const removeFile = (id: string) => {
@@ -166,17 +135,10 @@ export default function ChatInput({ onSend, isStreaming, onStop }: Props) {
                 <ArrowUp className="w-4 h-4 text-background" />
               </button>
             ) : (
-              <button
-                onClick={toggleRecording}
-                className={`p-1.5 rounded-lg transition-colors ${isRecording ? 'recording-pulse' : 'hover:bg-accent'}`}
-                aria-label={isRecording ? 'Parar gravação' : 'Gravar voz'}
-              >
-                {isRecording ? (
-                  <div className="w-5 h-5 rounded-full bg-destructive" />
-                ) : (
-                  <Mic className="w-5 h-5 text-muted-foreground" />
-                )}
-              </button>
+              <VoiceInputButton
+                onTranscript={handleVoiceTranscript}
+                disabled={isStreaming}
+              />
             )}
           </div>
         </div>

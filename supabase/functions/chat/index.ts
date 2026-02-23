@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import Anthropic from "npm:@anthropic-ai/sdk@0.39.0";
 
 const corsHeaders = {
@@ -22,6 +23,8 @@ serve(async (req) => {
     const {
       messages,
       systemPrompt,
+      agentId,
+      userId,
       modelId,
       extendedThinking,
       maxTokens,
@@ -30,6 +33,90 @@ serve(async (req) => {
 
     const anthropic = new Anthropic({ apiKey });
 
+    // Build system prompt with context
+    let fullSystemPrompt = systemPrompt || "Você é um assistente útil e inteligente.";
+
+    // If userId and agentId provided, try RAG-based context injection
+    if (userId && agentId) {
+      const openaiKey = Deno.env.get("OPENAI_API_KEY");
+      const supabaseUrl = Deno.env.get("SUPABASE_URL");
+      const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+
+      if (openaiKey && supabaseUrl && supabaseKey) {
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        // Get agent prompt from DB (if available)
+        const { data: agentPrompt } = await supabase
+          .from("agent_prompts")
+          .select("*")
+          .eq("agent_id", agentId)
+          .single();
+
+        if (agentPrompt) {
+          fullSystemPrompt = agentPrompt.system_prompt;
+        }
+
+        // Get last user message for RAG search
+        const lastUserMessage = messages
+          ?.filter((m: any) => m.role === "user")
+          ?.pop();
+
+        if (lastUserMessage?.content) {
+          try {
+            // Generate embedding for the query
+            const embResponse = await fetch("https://api.openai.com/v1/embeddings", {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${openaiKey}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                model: "text-embedding-ada-002",
+                input: lastUserMessage.content,
+              }),
+            });
+
+            if (embResponse.ok) {
+              const embData = await embResponse.json();
+              const queryEmbedding = embData.data[0].embedding;
+
+              // Search for relevant chunks
+              const filterTypes = agentPrompt?.requires_documents?.length > 0
+                ? agentPrompt.requires_documents
+                : null;
+
+              const { data: relevantChunks } = await supabase.rpc("search_documents", {
+                query_embedding: JSON.stringify(queryEmbedding),
+                match_count: 10,
+                filter_user_id: userId,
+                filter_document_types: filterTypes,
+              });
+
+              if (relevantChunks && relevantChunks.length > 0) {
+                fullSystemPrompt += "\n\n## CONTEXTO DOS DOCUMENTOS DO USUÁRIO:\n\n";
+                relevantChunks.forEach((chunk: any, index: number) => {
+                  fullSystemPrompt += `[Trecho ${index + 1} (relevância: ${(chunk.similarity * 100).toFixed(1)}%)]:\n${chunk.content}\n\n`;
+                });
+              }
+            }
+          } catch (ragError) {
+            console.error("RAG search error (non-fatal):", ragError);
+            // Continue without RAG context
+          }
+        }
+      }
+    }
+
+    // Also append manual context documents if provided
+    if (contextDocuments) {
+      fullSystemPrompt += "\n\n## DOCUMENTOS DE CONTEXTO ADICIONAIS:\n";
+      for (const [key, value] of Object.entries(contextDocuments)) {
+        if (value) {
+          fullSystemPrompt += `\n### ${key}:\n${value}\n`;
+        }
+      }
+    }
+
     // Build API messages
     const apiMessages = messages
       .filter((msg: any) => msg.role === "user" || msg.role === "assistant")
@@ -37,18 +124,6 @@ serve(async (req) => {
         role: msg.role,
         content: msg.content,
       }));
-
-    // Build system prompt with context
-    let fullSystemPrompt = systemPrompt || "Você é um assistente útil e inteligente.";
-
-    if (contextDocuments) {
-      fullSystemPrompt += "\n\n## DOCUMENTOS DE CONTEXTO:\n";
-      for (const [key, value] of Object.entries(contextDocuments)) {
-        if (value) {
-          fullSystemPrompt += `\n### ${key}:\n${value}\n`;
-        }
-      }
-    }
 
     // Build request params
     const requestParams: any = {
@@ -64,7 +139,6 @@ serve(async (req) => {
         type: "enabled",
         budget_tokens: 10000,
       };
-      // When thinking is enabled, max_tokens must be larger than budget
       requestParams.max_tokens = Math.max(requestParams.max_tokens, 16000);
     }
 
