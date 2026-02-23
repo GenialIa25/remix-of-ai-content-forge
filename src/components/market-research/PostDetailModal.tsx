@@ -28,6 +28,8 @@ export default function PostDetailModal({ post, open, onClose, onSave }: Props) 
               src={post.media_url || post.thumbnail_url}
               alt="Post"
               className="w-full h-full object-cover max-h-[40vh] md:max-h-[85vh]"
+              referrerPolicy="no-referrer"
+              crossOrigin="anonymous"
             />
           </div>
 
