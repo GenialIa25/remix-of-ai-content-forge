@@ -57,6 +57,8 @@ export async function searchMarket(request: SearchRequest): Promise<SearchRespon
 
   const data = await res.json();
 
+  console.log('[MarketResearch] Raw webhook response:', data);
+
   // Normalize response — the webhook may return an array, a single object, or {posts:[...]}
   let rawPosts: any[];
   if (Array.isArray(data)) {
@@ -64,30 +66,51 @@ export async function searchMarket(request: SearchRequest): Promise<SearchRespon
   } else if (data.posts && Array.isArray(data.posts)) {
     rawPosts = data.posts;
   } else if (data && data.id) {
-    // Single post object returned
     rawPosts = [data];
   } else {
     rawPosts = [];
   }
 
-  const posts = rawPosts.map((item: any, i: number) => ({
-    id: item.id || `post_${Date.now()}_${i}`,
-    post_url: item.url || item.post_url || '',
-    type: item.type || request.post_type || 'image',
-    thumbnail_url: item.displayUrl || item.thumbnail_url || item.thumbnailUrl || '',
-    media_url: item.videoUrl || item.displayUrl || item.media_url || '',
-    caption: item.caption || '',
-    published_at: item.timestamp || item.published_at || new Date().toISOString(),
-    metrics: {
-      likes: item.likesCount ?? item.likes ?? 0,
-      comments: item.commentsCount ?? item.comments ?? 0,
-      shares: item.sharesCount ?? item.shares ?? 0,
-      views: item.videoViewCount ?? item.viewsCount ?? item.views ?? 0,
-      engagement_rate: item.engagement_rate ?? 0,
-    },
-    hashtags: item.hashtags || [],
-    mentions: item.mentions || [],
-  }));
+  const posts = rawPosts.map((item: any, i: number) => {
+    // Normalize type to lowercase (webhook returns "Video", "Sidecar", "Image", etc.)
+    const rawType = (item.type || '').toLowerCase();
+    let type: 'reel' | 'carousel' | 'image' | 'video';
+    if (rawType === 'video') type = 'video';
+    else if (rawType === 'sidecar') type = 'carousel';
+    else if (rawType === 'image') type = 'image';
+    else type = 'image';
+
+    // Build thumbnail: prefer displayUrl for images/thumbnails
+    const thumbnail = item.displayUrl || item.thumbnailUrl || item.thumbnail_url || '';
+    // Build media: prefer videoUrl for videos, fallback to displayUrl
+    const media = item.videoUrl || item.displayUrl || item.media_url || '';
+
+    // Extract images array if available (carousel posts)
+    const images = item.images || [];
+    const mediaUrls = images.length > 0
+      ? images.map((img: any) => typeof img === 'string' ? img : img.url || img.src || '')
+      : undefined;
+
+    return {
+      id: item.id || item.shortCode || `post_${Date.now()}_${i}`,
+      post_url: item.url || item.post_url || '',
+      type,
+      thumbnail_url: thumbnail,
+      media_url: media,
+      media_urls: mediaUrls,
+      caption: item.caption || '',
+      published_at: item.timestamp || item.published_at || new Date().toISOString(),
+      metrics: {
+        likes: item.likesCount ?? item.diggCount ?? item.likes ?? 0,
+        comments: item.commentsCount ?? item.commentCount ?? item.comments ?? 0,
+        shares: item.sharesCount ?? item.shareCount ?? item.shares ?? 0,
+        views: item.videoViewCount ?? item.videoPlayCount ?? item.playCount ?? item.viewsCount ?? item.views ?? 0,
+        engagement_rate: item.engagement_rate ?? 0,
+      },
+      hashtags: item.hashtags || [],
+      mentions: item.mentions || [],
+    };
+  });
 
   return {
     success: true,
