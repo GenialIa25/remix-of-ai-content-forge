@@ -1,94 +1,101 @@
-import { SearchRequest, SearchResponse, Post, PostMetrics } from '@/types/marketResearch';
+import { SearchRequest, SearchResponse } from '@/types/marketResearch';
 
-const WEBHOOK_URL = 'https://seu-n8n.com/webhook/pesquisa-mercado';
+const WEBHOOK_URL = 'https://hook.us2.make.com/foo6ybotx2fqfrunlah4lu75y46dvm01';
 
-// Generate mock data for demo purposes
-function generateMockPosts(count: number, type?: string): Post[] {
-  const types: Post['type'][] = ['reel', 'carousel', 'image', 'video'];
-  const captions = [
-    '🚀 5 estratégias de marketing digital que vão transformar seu negócio em 2026! #marketing #digital #estrategia',
-    '📊 Como analisar seus concorrentes e encontrar oportunidades no mercado. Salve esse post! #empreendedorismo',
-    '🎯 O segredo para criar conteúdo que engaja: conheça seu público como ninguém. #conteudo #engajamento',
-    '💡 Dica rápida: Use storytelling nos seus reels para aumentar a retenção em até 300%! #reels #storytelling',
-    '🔥 Tendências de redes sociais para ficar de olho esse ano. Qual você já está usando? #tendencias #socialmedia',
-    '📱 Tutorial: Como criar carrosséis que viralizam no Instagram. Passo a passo completo! #tutorial #instagram',
-    '🎬 Por trás das câmeras: como eu gravo meus vídeos em casa com equipamento simples. #bastidores #criador',
-    '✨ Resultados reais: cliente aumentou vendas em 250% com nossa estratégia de conteúdo #resultados #case',
-  ];
+function buildPeriodFilter(periodDays: number): string {
+  if (periodDays <= 7) return '1 week';
+  if (periodDays <= 30) return '1 month';
+  if (periodDays <= 90) return '3 months';
+  if (periodDays <= 180) return '6 months';
+  return '1 year';
+}
 
-  return Array.from({ length: count }, (_, i) => {
-    const postType = type && type !== 'all' ? type as Post['type'] : types[Math.floor(Math.random() * types.length)];
-    const metrics: PostMetrics = {
-      likes: Math.floor(Math.random() * 50000) + 500,
-      comments: Math.floor(Math.random() * 2000) + 10,
-      shares: Math.floor(Math.random() * 1000) + 5,
-      views: Math.floor(Math.random() * 500000) + 5000,
-      engagement_rate: Math.round((Math.random() * 8 + 0.5) * 10) / 10,
-    };
+function mapResultsType(postType?: string): string {
+  if (!postType || postType === 'all') return 'posts';
+  if (postType === 'reels' || postType === 'video') return 'reels';
+  return 'posts';
+}
 
-    return {
-      id: `post_${Date.now()}_${i}`,
-      post_url: `https://instagram.com/p/${Math.random().toString(36).slice(2, 8)}`,
-      type: postType,
-      thumbnail_url: `https://picsum.photos/seed/${i + Date.now()}/400/400`,
-      media_url: `https://picsum.photos/seed/${i + Date.now()}/800/800`,
-      caption: captions[i % captions.length],
-      published_at: new Date(Date.now() - Math.floor(Math.random() * 30) * 86400000).toISOString(),
-      metrics,
-      hashtags: ['#marketing', '#digital', '#conteudo'],
-      mentions: Math.random() > 0.5 ? ['@usuario1'] : [],
-    };
-  });
+function buildDirectUrl(platform: string, username?: string, keyword?: string, searchType?: string): string[] {
+  const clean = (username || '').replace(/^@/, '').trim();
+  if (searchType === 'profile' && clean) {
+    if (platform === 'tiktok') return [`https://www.tiktok.com/@${clean}`];
+    return [`https://www.instagram.com/${clean}/`];
+  }
+  // For keyword search, use explore/tags on Instagram
+  const kw = (keyword || '').trim().replace(/^#/, '');
+  if (platform === 'tiktok') return [`https://www.tiktok.com/tag/${kw}`];
+  return [`https://www.instagram.com/explore/tags/${kw}/`];
 }
 
 export async function searchMarket(request: SearchRequest): Promise<SearchResponse> {
-  // For demo, return mock data. Replace with real webhook call below.
-  await new Promise(r => setTimeout(r, 2000 + Math.random() * 1000));
-
-  const posts = generateMockPosts(24, request.post_type);
-
-  return {
-    success: true,
-    request_id: request.request_id,
-    metadata: {
-      platform: request.platform,
-      username: request.username || request.keyword || '',
-      profile_picture: `https://picsum.photos/seed/profile/200/200`,
-      followers: Math.floor(Math.random() * 1000000) + 10000,
-      following: Math.floor(Math.random() * 1000) + 100,
-      total_posts: posts.length,
-      scraped_at: new Date().toISOString(),
-    },
-    posts,
-    pagination: {
-      total: 127,
-      returned: posts.length,
-      has_more: true,
-      next_cursor: 'cursor_next',
-    },
+  const payload = {
+    addParentData: false,
+    directUrls: buildDirectUrl(request.platform, request.username, request.keyword, request.search_type),
+    onlyPostsNewerThan: buildPeriodFilter(request.period_days || 30),
+    resultsLimit: 20,
+    resultsType: mapResultsType(request.post_type),
+    searchLimit: 1,
+    searchType: 'hashtag',
   };
 
-  /* Real webhook call:
   const res = await fetch(WEBHOOK_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(request),
+    body: JSON.stringify(payload),
   });
-  return res.json();
-  */
-}
 
-export async function loadMorePosts(request: SearchRequest): Promise<SearchResponse> {
-  await new Promise(r => setTimeout(r, 1500));
-  const posts = generateMockPosts(12, request.post_type);
+  if (!res.ok) {
+    return {
+      success: false,
+      request_id: request.request_id,
+      posts: [],
+      error: { code: 'WEBHOOK_ERROR', message: `Erro do webhook: ${res.status}` },
+    };
+  }
+
+  const data = await res.json();
+
+  // Normalize response — the webhook may return an array or an object
+  const rawPosts = Array.isArray(data) ? data : data.posts || [];
+
+  const posts = rawPosts.map((item: any, i: number) => ({
+    id: item.id || `post_${Date.now()}_${i}`,
+    post_url: item.url || item.post_url || '',
+    type: item.type || request.post_type || 'image',
+    thumbnail_url: item.displayUrl || item.thumbnail_url || item.thumbnailUrl || '',
+    media_url: item.videoUrl || item.displayUrl || item.media_url || '',
+    caption: item.caption || '',
+    published_at: item.timestamp || item.published_at || new Date().toISOString(),
+    metrics: {
+      likes: item.likesCount ?? item.likes ?? 0,
+      comments: item.commentsCount ?? item.comments ?? 0,
+      shares: item.sharesCount ?? item.shares ?? 0,
+      views: item.videoViewCount ?? item.viewsCount ?? item.views ?? 0,
+      engagement_rate: item.engagement_rate ?? 0,
+    },
+    hashtags: item.hashtags || [],
+    mentions: item.mentions || [],
+  }));
+
   return {
     success: true,
     request_id: request.request_id,
     posts,
     pagination: {
-      total: 127,
+      total: posts.length,
       returned: posts.length,
       has_more: false,
     },
+  };
+}
+
+export async function loadMorePosts(request: SearchRequest): Promise<SearchResponse> {
+  // Load more not supported with this webhook
+  return {
+    success: true,
+    request_id: request.request_id,
+    posts: [],
+    pagination: { total: 0, returned: 0, has_more: false },
   };
 }
