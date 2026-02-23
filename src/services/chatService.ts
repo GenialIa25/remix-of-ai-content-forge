@@ -27,6 +27,7 @@ interface SendMessageParams {
   modelId: string;
   extendedThinking: boolean;
   contextDocuments?: Record<string, string>;
+  userId?: string;
 }
 
 export async function sendChatMessage(params: SendMessageParams): Promise<{
@@ -42,6 +43,8 @@ export async function sendChatMessage(params: SendMessageParams): Promise<{
     body: {
       messages: params.messages,
       systemPrompt: getSystemPrompt(params.agentId),
+      agentId: params.agentId,
+      userId: params.userId,
       modelId: model?.apiModelId || 'claude-sonnet-4-5-20250514',
       extendedThinking: actualThinking,
       maxTokens: model?.maxTokens || 8000,
