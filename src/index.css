@@ -261,16 +261,16 @@
 
 /* Greeting typography - ITC Garamond */
 .greeting-prompt {
-  font-family: 'ITC Garamond Std Book', Garamond, Georgia, serif;
+  font-family: 'ITC Garamond Std Book Narrow', Garamond, Georgia, serif;
   font-weight: normal;
 }
 
 .greeting-name {
-  font-family: 'ITC Garamond Std Book Narrow', Garamond, Georgia, serif;
+  font-family: 'ITC Garamond Std Book', Garamond, Georgia, serif;
   font-weight: bold;
 }
 
 .greeting-question {
-  font-family: 'ITC Garamond Std Book', Garamond, Georgia, serif;
+  font-family: 'ITC Garamond Std Book Narrow', Garamond, Georgia, serif;
   font-weight: normal;
 }
