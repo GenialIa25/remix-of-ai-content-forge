@@ -49,7 +49,7 @@ export default function Sidebar() {
           {isMobile ? <X className="w-[18px] h-[18px] text-muted-foreground" /> : <PanelLeft className="w-[18px] h-[18px] text-muted-foreground" />}
         </button>
         <button
-          onClick={() => setActiveConversation(null)}
+          onClick={() => { setActiveConversation(null); setActivePage('home'); }}
           className="p-2 rounded-lg hover:bg-secondary transition-colors"
           title="Novo chat"
           aria-label="Novo chat"
