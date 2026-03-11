@@ -230,6 +230,30 @@ export default function HomePage() {
                       </div>
                     </button>
                   ))}
+
+                  {/* Separator */}
+                  <div className="my-1.5 mx-3 border-t border-border" />
+
+                  {/* Gemini group */}
+                  <p className="px-3 py-1.5 text-xs text-muted-foreground font-medium">Gemini</p>
+                  {AI_MODELS.filter(m => m.provider === 'google').map((model) => (
+                    <button
+                      key={model.id}
+                      onClick={() => { setSelectedModel(model.id); setModelDropdown(false); }}
+                      className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors flex items-center justify-between ${
+                        selectedModel === model.id ? 'bg-secondary text-foreground' : 'hover:bg-secondary text-foreground'
+                      }`}
+                    >
+                      <div>
+                        <span className="block font-medium">{model.name}</span>
+                        <span className="block text-xs text-muted-foreground">{model.description}</span>
+                      </div>
+                      <div className="flex items-center gap-2 ml-2 shrink-0">
+                        {model.badge && <span className="text-xs text-muted-foreground">{model.badge}</span>}
+                        {selectedModel === model.id && <Check className="w-4 h-4 text-muted-foreground" />}
+                      </div>
+                    </button>
+                  ))}
                 </div>
               </>
             )}
