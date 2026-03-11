@@ -52,12 +52,11 @@ export default function Header() {
                   <button
                     key={model.id}
                     onClick={() => { setSelectedModel(model.id); setModelDropdown(false); }}
-                    className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors flex items-center justify-between ${
+                    className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
                       selectedModel === model.id ? 'bg-secondary text-foreground' : 'hover:bg-secondary text-foreground'
                     }`}
                   >
-                    <span>{model.name}</span>
-                    {model.badge && <span className="text-xs text-muted-foreground ml-2">{model.badge}</span>}
+                    <span>{model.name}{model.badge && <span className="text-xs text-muted-foreground"> {model.badge}</span>}</span>
                   </button>
                 ))}
               </div>
