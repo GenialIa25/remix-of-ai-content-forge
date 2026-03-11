@@ -176,8 +176,8 @@ export default function HomePage() {
               <span className="text-[17px] font-normal text-foreground">
                 {currentModel?.provider === 'anthropic' ? 'Claude' : currentModel?.provider === 'openai' ? 'ChatGPT' : 'Gemini'}
               </span>
-              <span className="text-[17px] font-light text-muted-foreground">
-                {currentModel?.name.replace(/^Claude\s*/, '').replace(/^ChatGPT\s*/, '') || 'Chat'}
+              <span className="text-[17px] font-normal text-muted-foreground">
+                {currentModel?.name.replace(/^Claude\s*/, '').replace(/^ChatGPT\s*/, '').replace(/^Gemini\s*/, '') || 'Chat'}
               </span>
               <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
             </button>
