@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { AGENTS, AGENT_AVATARS } from '@/types';
 import { useChatStore } from '@/stores/chatStore';
-import { PanelLeft, Pencil, Search, Image, AppWindow, BookOpen, MessageSquare, X, FlaskConical, Sun, Moon } from 'lucide-react';
+import { PanelLeft, Pencil, Search, Image, AppWindow, BookOpen, MessageSquare, X, FlaskConical, Sun, Moon, Home } from 'lucide-react';
 import { useTheme } from '@/hooks/useTheme';
 import SearchModal from '@/components/modals/SearchModal';
 import ImagesModal from '@/components/modals/ImagesModal';
