@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import gemzLogo from '@/assets/gemz-logo.png';
 import { AGENTS, AGENT_AVATARS } from '@/types';
 import { useChatStore } from '@/stores/chatStore';
 import { PanelLeft, Pencil, Search, Image, AppWindow, BookOpen, MessageSquare, X, FlaskConical, Sun, Moon, Home } from 'lucide-react';
