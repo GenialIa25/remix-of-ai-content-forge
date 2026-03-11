@@ -15,6 +15,14 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'ITC Garamond Std Book Narrow';
+  src: url('./assets/fonts/itc-garamond-std-book-narrow.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -31,6 +39,14 @@
 @font-face {
   font-family: 'ITC Garamond Std Lt Cond';
   src: url('@/assets/fonts/ITCGaramondStd-LtCond.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ITC Garamond Std Book Narrow';
+  src: url('@/assets/fonts/itc-garamond-std-book-narrow.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -266,7 +282,7 @@
 }
 
 .greeting-name {
-  font-family: 'ITC Garamond Std Book', Garamond, Georgia, serif;
+  font-family: 'ITC Garamond Std Book Narrow', Garamond, Georgia, serif;
   font-weight: bold;
 }
 
