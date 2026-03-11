@@ -75,7 +75,7 @@ export default function Sidebar() {
 
       {/* Agents Section - label "GPTs" not "AGENTES" */}
       <div className="mt-4 px-2">
-        <span className="px-3 text-xs font-medium text-muted-foreground">GPTs</span>
+        <span className="px-3 text-xs font-medium text-muted-foreground">Agentes</span>
       </div>
 
       <div className="flex-1 overflow-y-auto px-2 mt-2 space-y-0.5">
