@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect, KeyboardEvent, useCallback } from 'react';
 import { useChatStore } from '@/stores/chatStore';
 import { sendChatMessage } from '@/services/chatService';
-import { Message } from '@/types';
-import { Plus, ArrowUp, Square, Paperclip, ImagePlus, Search, Globe, Mic, AudioLines, X } from 'lucide-react';
+import { AI_MODELS, Message } from '@/types';
+import { Plus, ArrowUp, Square, Paperclip, ImagePlus, Search, Globe, Mic, AudioLines, ChevronDown, Check, PanelLeft, Menu } from 'lucide-react';
 import { AttachedFiles, UploadedFile } from '@/components/chat/FileUploadButton';
 import MessageBubble from '@/components/chat/MessageBubble';
 import { useAuth } from '@/contexts/AuthContext';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const PLUS_MENU_ITEMS = [
   { id: 'files', label: 'Adicionar fotos e arquivos', icon: Paperclip },
