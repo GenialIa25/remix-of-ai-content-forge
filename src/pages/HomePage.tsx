@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect, KeyboardEvent, useCallback } from 'react';
 import { useChatStore } from '@/stores/chatStore';
 import { sendChatMessage } from '@/services/chatService';
-import { Message } from '@/types';
-import { Plus, ArrowUp, Square, Paperclip, ImagePlus, Search, Globe, Mic, AudioLines, X } from 'lucide-react';
+import { AI_MODELS, Message } from '@/types';
+import { Plus, ArrowUp, Square, Paperclip, ImagePlus, Search, Globe, Mic, AudioLines, ChevronDown, Check, PanelLeft, Menu } from 'lucide-react';
 import { AttachedFiles, UploadedFile } from '@/components/chat/FileUploadButton';
 import MessageBubble from '@/components/chat/MessageBubble';
 import { useAuth } from '@/contexts/AuthContext';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const PLUS_MENU_ITEMS = [
   { id: 'files', label: 'Adicionar fotos e arquivos', icon: Paperclip },
@@ -15,16 +16,20 @@ const PLUS_MENU_ITEMS = [
 ];
 
 export default function HomePage() {
-  const { selectedModel, thinkingMode } = useChatStore();
+  const { selectedModel, setSelectedModel, thinkingMode, sidebarOpen, setSidebarOpen } = useChatStore();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [attachedFiles, setAttachedFiles] = useState<UploadedFile[]>([]);
   const [showPlusMenu, setShowPlusMenu] = useState(false);
+  const [modelDropdown, setModelDropdown] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
+  const isMobile = useIsMobile();
+
+  const currentModel = AI_MODELS.find(m => m.id === selectedModel);
 
   const firstName = (() => {
     const raw = user?.email?.split('@')[0] || 'Usuário';
@@ -144,6 +149,58 @@ export default function HomePage() {
 
   return (
     <div className="flex-1 flex flex-col min-w-0 h-screen">
+      {/* Header with model selector */}
+      <header className="h-12 flex items-center justify-between px-4 shrink-0">
+        <div className="flex items-center gap-2">
+          {!sidebarOpen && (
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="p-2 rounded-lg hover:bg-secondary transition-colors"
+              aria-label="Abrir sidebar"
+            >
+              {isMobile ? <Menu className="w-[18px] h-[18px] text-muted-foreground" /> : <PanelLeft className="w-[18px] h-[18px] text-muted-foreground" />}
+            </button>
+          )}
+
+          <div className="relative">
+            <button
+              onClick={() => setModelDropdown(!modelDropdown)}
+              className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-secondary transition-colors"
+              aria-label="Selecionar modelo"
+            >
+              <span className="text-base font-semibold text-foreground">
+                {currentModel?.name || 'Chat'}
+              </span>
+              <ChevronDown className="w-4 h-4 text-muted-foreground" />
+            </button>
+
+            {modelDropdown && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setModelDropdown(false)} />
+                <div className="absolute top-full left-0 mt-1 z-50 bg-popover rounded-xl shadow-lg border border-border min-w-[260px] p-2">
+                  <p className="px-3 py-1.5 text-xs text-muted-foreground font-medium">Modelo</p>
+                  {AI_MODELS.map((model) => (
+                    <button
+                      key={model.id}
+                      onClick={() => { setSelectedModel(model.id); setModelDropdown(false); }}
+                      className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors flex items-center justify-between ${
+                        selectedModel === model.id ? 'bg-secondary text-foreground' : 'hover:bg-secondary text-foreground'
+                      }`}
+                    >
+                      <div>
+                        <span className="block font-medium">{model.name}</span>
+                        <span className="block text-xs text-muted-foreground">{model.description}</span>
+                      </div>
+                      {selectedModel === model.id && <Check className="w-4 h-4 text-muted-foreground ml-2 shrink-0" />}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </header>
+
       {/* Hidden file input */}
       <input
         ref={fileInputRef}
