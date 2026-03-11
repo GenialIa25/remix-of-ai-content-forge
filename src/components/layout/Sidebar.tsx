@@ -150,11 +150,13 @@ export default function Sidebar() {
   );
 }
 
-function NavItem({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick?: () => void }) {
+function NavItem({ icon, label, onClick, active }: { icon: React.ReactNode; label: string; onClick?: () => void; active?: boolean }) {
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-secondary transition-colors"
+      className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+        active ? 'bg-secondary' : 'hover:bg-secondary'
+      }`}
       aria-label={label}
     >
       <span className="text-muted-foreground">{icon}</span>
