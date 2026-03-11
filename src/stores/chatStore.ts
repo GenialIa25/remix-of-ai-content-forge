@@ -29,7 +29,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   sidebarOpen: true,
   selectedModel: 'claude-opus-4.5',
   thinkingMode: true,
-  activePage: 'chat',
+  activePage: 'home',
 
   setActiveAgent: (agentId) => set({ activeAgentId: agentId, activeConversationId: null, activePage: 'chat' }),
   setActivePage: (page) => set({ activePage: page }),
