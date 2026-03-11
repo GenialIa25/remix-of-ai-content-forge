@@ -10,7 +10,7 @@ import DocumentsModal from '@/components/modals/DocumentsModal';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 export default function Sidebar() {
-  const { sidebarOpen, setSidebarOpen, activeAgentId, setActiveAgent, conversations, activeConversationId, setActiveConversation, setActivePage } = useChatStore();
+  const { sidebarOpen, setSidebarOpen, activeAgentId, setActiveAgent, conversations, activeConversationId, setActiveConversation, setActivePage, activePage } = useChatStore();
   const isMobile = useIsMobile();
   const [searchOpen, setSearchOpen] = useState(false);
   const [imagesOpen, setImagesOpen] = useState(false);
