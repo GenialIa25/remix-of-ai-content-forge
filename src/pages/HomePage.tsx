@@ -3,6 +3,7 @@ import { useChatStore } from '@/stores/chatStore';
 import { sendChatMessage } from '@/services/chatService';
 import { AI_MODELS, Message } from '@/types';
 import { Plus, ArrowUp, Square, Paperclip, ImagePlus, Search, Globe, Mic, AudioLines, ChevronDown, Check, PanelLeft, Menu } from 'lucide-react';
+import gemzLogo from '@/assets/gemz-logo.png';
 import { AttachedFiles, UploadedFile } from '@/components/chat/FileUploadButton';
 import MessageBubble from '@/components/chat/MessageBubble';
 import { useAuth } from '@/contexts/AuthContext';
