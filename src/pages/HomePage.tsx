@@ -160,7 +160,7 @@ export default function HomePage() {
 
           {/* Centered input */}
           <div className="w-full max-w-[680px] relative">
-            <div className="bg-secondary border border-border rounded-[28px] px-4 py-3 focus-within:border-muted-foreground/40 transition-colors">
+            <div className="bg-secondary border border-border rounded-[28px] px-4 py-2.5 focus-within:border-muted-foreground/40 transition-colors">
               <AttachedFiles files={attachedFiles} onRemove={removeFile} />
 
               <div className="flex items-end gap-2">
