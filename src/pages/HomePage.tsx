@@ -204,7 +204,7 @@ export default function HomePage() {
                   aria-label="Mensagem"
                 />
 
-                <div className="flex items-center gap-1 shrink-0 mb-0.5">
+                <div className="flex items-center gap-1 shrink-0">
                   {isStreaming ? (
                     <button
                       onClick={() => setIsStreaming(false)}
