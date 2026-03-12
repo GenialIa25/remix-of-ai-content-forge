@@ -47,6 +47,16 @@ export const AGENT_AVATARS: Record<string, string> = {
   'matrix-generator': '/assets/agents/gerador-matriz.png',
   'marketing-manager': '/assets/agents/gerente-marketing.png',
   'scriptwriter': '/assets/agents/roteirista.png',
+  'expert-social-selling': '/assets/agents/gerente-marketing.png',
+  'criador-documento-oferta': '/assets/agents/brand-book.png',
+  'amanda-ai': '/assets/agents/estrategista-pilares.png',
+  'arquiteta-perfil-icp': '/assets/agents/arquiteto-icp.png',
+  'programa-rivotril': '/assets/agents/pesquisador-mercado.png',
+  'estrategias-sprint-20k': '/assets/agents/gerador-matriz.png',
+  'arquiteta-workshops': '/assets/agents/roteirista.png',
+  'feedback-conteudo': '/assets/agents/gerente-marketing.png',
+  'copywriter-campanhas': '/assets/agents/brand-book.png',
+  'vsl-invisivel': '/assets/agents/roteirista.png',
 };
 
 export const AGENTS: Agent[] = [
