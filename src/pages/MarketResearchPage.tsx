@@ -67,8 +67,13 @@ export default function MarketResearchPage({ onBack }: Props) {
     : [{ value: 'all', label: 'Todos' }];
 
   const handleSearch = async () => {
+    if (isSearching) return;
     const inputValue = tab === 'profile' ? username.trim() : keyword.trim();
     if (!inputValue) return;
+
+    setIsSearching(true);
+    setWebhookStatus('idle');
+    setWebhookError(false);
 
     const limitNum = resultsLimit ? Math.min(20, Math.max(1, parseInt(resultsLimit, 10) || 20)) : 20;
 
@@ -149,7 +154,6 @@ export default function MarketResearchPage({ onBack }: Props) {
       };
     }
 
-    setWebhookError(false);
     try {
       const res = await fetch('https://hook.us1.make.com/rgp4sp2c0xxuv9hq3fft1my1jqxxytsg', {
         method: 'POST',
@@ -158,10 +162,15 @@ export default function MarketResearchPage({ onBack }: Props) {
       });
 
       if (!res.ok) throw new Error('Webhook error');
-      toast.success('Pesquisa enviada com sucesso!');
+      setWebhookStatus('success');
       setWebhookSent(true);
+
+      // Hide success message after 4s — progress bar takes over
+      setTimeout(() => setWebhookStatus('idle'), 4000);
     } catch (err) {
+      setWebhookStatus('error');
       setWebhookError(true);
+      setIsSearching(false);
       return;
     }
 
@@ -170,6 +179,7 @@ export default function MarketResearchPage({ onBack }: Props) {
       resultsLimit: limitNum,
     };
     search(filters);
+    setIsSearching(false);
   };
 
   const searched = posts.length > 0 || error || loading;
