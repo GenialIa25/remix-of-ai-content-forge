@@ -155,6 +155,7 @@ export default function MarketResearchPage({ onBack }: Props) {
 
       if (!res.ok) throw new Error('Webhook error');
       toast.success('Pesquisa enviada com sucesso!');
+      setWebhookSent(true);
     } catch (err) {
       toast.error('Erro ao enviar pesquisa. Tente novamente.');
     }
