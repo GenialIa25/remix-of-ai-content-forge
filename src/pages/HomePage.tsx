@@ -16,6 +16,12 @@ const PLUS_MENU_ITEMS = [
   { id: 'web', label: 'Busca na web', icon: Globe },
 ];
 
+const LATEST_MODELS_HOME = [
+  { id: 'auto', name: 'Auto', description: 'Escolhe por quanto tempo pensar', icon: Sparkles },
+  { id: 'chatgpt-5.3-instant', name: 'Instant 5.3', description: 'Respostas imediatas', icon: Zap },
+  { id: 'chatgpt-5.3', name: 'Thinking 5.4', description: 'Pensa mais para gerar respostas melhores', icon: Brain },
+];
+
 export default function HomePage() {
   const { selectedModel, setSelectedModel, thinkingMode, sidebarOpen, setSidebarOpen } = useChatStore();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -24,6 +30,7 @@ export default function HomePage() {
   const [attachedFiles, setAttachedFiles] = useState<UploadedFile[]>([]);
   const [showPlusMenu, setShowPlusMenu] = useState(false);
   const [modelDropdown, setModelDropdown] = useState(false);
+  const [showMoreModels, setShowMoreModels] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
