@@ -155,7 +155,7 @@ export default function DocumentsModal({ open, onClose }: Props) {
                         <div className="relative shrink-0">
                           <button
                             onClick={() => setMenuOpen(menuOpen === doc.id ? null : doc.id)}
-                            className="p-2 rounded-lg hover:bg-secondary/60 opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="p-2 rounded-lg hover:bg-secondary/60 transition-colors"
                             aria-label="Menu de ações"
                           >
                             <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
