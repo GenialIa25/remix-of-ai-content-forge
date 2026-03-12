@@ -49,6 +49,7 @@ export default function MarketResearchPage({ onBack }: Props) {
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [resultsLimit, setResultsLimit] = useState<string>('');
   const [webhookSent, setWebhookSent] = useState(false);
+  const [webhookError, setWebhookError] = useState(false);
 
   const postTypeOptions = platform === 'instagram'
     ? [
@@ -146,6 +147,7 @@ export default function MarketResearchPage({ onBack }: Props) {
       };
     }
 
+    setWebhookError(false);
     try {
       const res = await fetch('https://hook.us1.make.com/rgp4sp2c0xxuv9hq3fft1my1jqxxytsg', {
         method: 'POST',
@@ -157,8 +159,8 @@ export default function MarketResearchPage({ onBack }: Props) {
       toast.success('Pesquisa enviada com sucesso!');
       setWebhookSent(true);
     } catch (err) {
-      toast.error('Não foi possível completar a pesquisa. O sistema pode estar fora do ar. Tente novamente ou acione o administrador.');
-      return; // Don't show progress bar on error
+      setWebhookError(true);
+      return;
     }
 
     const filters: SearchFilters = {
@@ -377,8 +379,8 @@ export default function MarketResearchPage({ onBack }: Props) {
             </div>
           )}
 
-          {/* Error */}
-          {error && !loading && !webhookSent && (
+          {/* Error — webhook or search */}
+          {(webhookError || (error && !loading)) && !webhookSent && (
             <div className="flex flex-col items-center justify-center py-16 text-center space-y-3">
               <AlertTriangle className="w-8 h-8 text-destructive/70" strokeWidth={1.5} />
               <p className="text-sm text-foreground">Não foi possível completar a pesquisa</p>
