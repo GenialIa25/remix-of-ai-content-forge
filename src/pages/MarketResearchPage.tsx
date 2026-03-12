@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { ArrowLeft, Search, Loader2, AlertTriangle, User, Image, Calendar, ListOrdered, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { PlatformIcon, PLATFORM_LIST } from '@/components/market-research/PlatformIcons';
