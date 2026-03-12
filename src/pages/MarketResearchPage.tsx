@@ -147,6 +147,7 @@ export default function MarketResearchPage({ onBack }: Props) {
       };
     }
 
+    setWebhookError(false);
     try {
       const res = await fetch('https://hook.us1.make.com/rgp4sp2c0xxuv9hq3fft1my1jqxxytsg', {
         method: 'POST',
@@ -158,8 +159,8 @@ export default function MarketResearchPage({ onBack }: Props) {
       toast.success('Pesquisa enviada com sucesso!');
       setWebhookSent(true);
     } catch (err) {
-      toast.error('Não foi possível completar a pesquisa. O sistema pode estar fora do ar. Tente novamente ou acione o administrador.');
-      return; // Don't show progress bar on error
+      setWebhookError(true);
+      return;
     }
 
     const filters: SearchFilters = {
