@@ -35,6 +35,12 @@ export default function HomePage() {
   const currentModel = AI_MODELS.find(m => m.id === selectedModel);
 
   const firstName = (() => {
+    const meta = user?.user_metadata;
+    const fullName = meta?.full_name || meta?.name || '';
+    if (fullName) {
+      const first = fullName.split(' ')[0];
+      return first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
+    }
     const raw = user?.email?.split('@')[0] || 'Usuário';
     return raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
   })();
