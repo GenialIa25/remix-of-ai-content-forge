@@ -8,6 +8,7 @@ import PostCard from '@/components/market-research/PostCard';
 import PostDetailModal from '@/components/market-research/PostDetailModal';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import ResearchProgressBar from '@/components/market-research/ResearchProgressBar';
 
 const PERIOD_OPTIONS = [
   { value: '1', label: 'Último dia' },
@@ -47,6 +48,7 @@ export default function MarketResearchPage({ onBack }: Props) {
   const [periodDays, setPeriodDays] = useState(30);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [resultsLimit, setResultsLimit] = useState<string>('');
+  const [webhookSent, setWebhookSent] = useState(false);
 
   const postTypeOptions = platform === 'instagram'
     ? [
@@ -153,6 +155,7 @@ export default function MarketResearchPage({ onBack }: Props) {
 
       if (!res.ok) throw new Error('Webhook error');
       toast.success('Pesquisa enviada com sucesso!');
+      setWebhookSent(true);
     } catch (err) {
       toast.error('Erro ao enviar pesquisa. Tente novamente.');
     }
@@ -357,8 +360,14 @@ export default function MarketResearchPage({ onBack }: Props) {
             </button>
           </div>
 
+          {/* Progress Bar */}
+          <ResearchProgressBar
+            active={webhookSent}
+            onComplete={() => setWebhookSent(false)}
+          />
+
           {/* Loading */}
-          {loading && (
+          {loading && !webhookSent && (
             <div className="flex flex-col items-center justify-center py-16 text-center space-y-3">
               <Loader2 className="w-8 h-8 text-muted-foreground animate-spin" />
               <p className="text-sm text-muted-foreground">
