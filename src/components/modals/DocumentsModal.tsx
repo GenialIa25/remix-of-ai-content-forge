@@ -1,4 +1,4 @@
-import { X, MoreHorizontal, FileText, Download, Pencil, Trash2, Eye } from 'lucide-react';
+import { X, MoreHorizontal, FileText, Download, Pencil, Trash2, Eye, BookOpen, BarChart3, Target } from 'lucide-react';
 import { AGENTS } from '@/types';
 import { useState } from 'react';
 import NewDocumentModal from '@/components/documents/NewDocumentModal';
@@ -10,14 +10,22 @@ interface DocItem {
   agentId: string;
   createdAt: string;
   type: string;
-  emoji: string;
+  icon: string;
   content: string;
 }
 
+const DOC_ICONS: Record<string, React.ReactNode> = {
+  'brand-book': <BookOpen className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />,
+  'market-research': <BarChart3 className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />,
+  'icp-architect': <Target className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />,
+};
+
+const fallbackIcon = <FileText className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />;
+
 const INITIAL_DOCS: DocItem[] = [
-  { id: '1', title: 'Brand Book - Minha Empresa', agentId: 'brand-book', createdAt: '09/02/2026', type: 'Brand Book', emoji: '📘', content: 'Conteúdo do Brand Book...' },
-  { id: '2', title: 'Highcharts - Minha Empresa', agentId: 'market-research', createdAt: '09/02/2026', type: 'Pesquisa', emoji: '📊', content: 'Conteúdo da pesquisa de mercado...' },
-  { id: '3', title: 'ICP Map - Minha Empresa', agentId: 'icp-architect', createdAt: '09/02/2026', type: 'ICP', emoji: '🎯', content: 'Conteúdo do mapa do ICP...' },
+  { id: '1', title: 'Brand Book - Minha Empresa', agentId: 'brand-book', createdAt: '09/02/2026', type: 'Brand Book', icon: 'brand-book', content: 'Conteúdo do Brand Book...' },
+  { id: '2', title: 'Highcharts - Minha Empresa', agentId: 'market-research', createdAt: '09/02/2026', type: 'Pesquisa', icon: 'market-research', content: 'Conteúdo da pesquisa de mercado...' },
+  { id: '3', title: 'ICP Map - Minha Empresa', agentId: 'icp-architect', createdAt: '09/02/2026', type: 'ICP', icon: 'icp-architect', content: 'Conteúdo do mapa do ICP...' },
 ];
 
 interface Props {
@@ -49,7 +57,7 @@ export default function DocumentsModal({ open, onClose }: Props) {
       agentId: doc.type,
       createdAt: new Date().toLocaleDateString('pt-BR'),
       type: typeLabel,
-      emoji: AGENTS.find(a => a.id === doc.type)?.emoji || '📄',
+      icon: doc.type,
       content: doc.content,
     };
     setDocs(prev => [newDoc, ...prev]);
@@ -135,8 +143,8 @@ export default function DocumentsModal({ open, onClose }: Props) {
                   {typeDocs.map((doc, i) => (
                     <div key={doc.id}>
                       <div className="flex items-center gap-4 py-5 group">
-                        <div className="w-9 h-9 rounded-[8px] bg-secondary/60 flex items-center justify-center shrink-0 text-lg">
-                          {doc.emoji}
+                        <div className="w-9 h-9 rounded-[8px] bg-secondary/60 flex items-center justify-center shrink-0">
+                          {DOC_ICONS[doc.icon] || fallbackIcon}
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-foreground">{doc.title}</p>
@@ -147,7 +155,7 @@ export default function DocumentsModal({ open, onClose }: Props) {
                         <div className="relative shrink-0">
                           <button
                             onClick={() => setMenuOpen(menuOpen === doc.id ? null : doc.id)}
-                            className="p-2 rounded-lg hover:bg-secondary/60 opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="p-2 rounded-lg hover:bg-secondary/60 transition-colors"
                             aria-label="Menu de ações"
                           >
                             <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
