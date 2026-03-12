@@ -360,8 +360,14 @@ export default function MarketResearchPage({ onBack }: Props) {
             </button>
           </div>
 
+          {/* Progress Bar */}
+          <ResearchProgressBar
+            active={webhookSent}
+            onComplete={() => setWebhookSent(false)}
+          />
+
           {/* Loading */}
-          {loading && (
+          {loading && !webhookSent && (
             <div className="flex flex-col items-center justify-center py-16 text-center space-y-3">
               <Loader2 className="w-8 h-8 text-muted-foreground animate-spin" />
               <p className="text-sm text-muted-foreground">
