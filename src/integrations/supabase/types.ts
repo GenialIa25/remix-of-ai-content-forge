@@ -136,6 +136,54 @@ export type Database = {
         }
         Relationships: []
       }
+      implementation_tasks: {
+        Row: {
+          created_at: string
+          id: string
+          month_order: number
+          month_title: string
+          status: string
+          tag_colors: string[] | null
+          tags: string[] | null
+          task_order: number
+          task_title: string
+          updated_at: string
+          url: string | null
+          week_order: number
+          week_title: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          month_order?: number
+          month_title: string
+          status?: string
+          tag_colors?: string[] | null
+          tags?: string[] | null
+          task_order?: number
+          task_title: string
+          updated_at?: string
+          url?: string | null
+          week_order?: number
+          week_title?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          month_order?: number
+          month_title?: string
+          status?: string
+          tag_colors?: string[] | null
+          tags?: string[] | null
+          task_order?: number
+          task_title?: string
+          updated_at?: string
+          url?: string | null
+          week_order?: number
+          week_title?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
