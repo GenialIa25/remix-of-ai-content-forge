@@ -6,27 +6,6 @@ import { ChevronDown, ChevronRight, Share, MoreHorizontal, PanelLeft, Menu, Chec
 import { useIsMobile } from '@/hooks/use-mobile';
 import gemzLogo from '@/assets/gemz-logo.png';
 
-// Latest models shown in main dropdown
-const LATEST_MODELS = [
-  {
-    id: 'auto',
-    name: 'Auto',
-    description: 'Escolhe por quanto tempo pensar',
-    icon: Sparkles,
-  },
-  {
-    id: 'chatgpt-5.3-instant',
-    name: 'Instant 5.3',
-    description: 'Respostas imediatas',
-    icon: Zap,
-  },
-  {
-    id: 'chatgpt-5.3',
-    name: 'Thinking 5.4',
-    description: 'Pensa mais para gerar respostas melhores',
-    icon: Brain,
-  },
-];
 
 
 export default function Header() {
