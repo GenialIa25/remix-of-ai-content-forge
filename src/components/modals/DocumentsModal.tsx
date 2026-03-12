@@ -23,9 +23,9 @@ const DOC_ICONS: Record<string, React.ReactNode> = {
 const fallbackIcon = <FileText className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />;
 
 const INITIAL_DOCS: DocItem[] = [
-  { id: '1', title: 'Brand Book - Minha Empresa', agentId: 'brand-book', createdAt: '09/02/2026', type: 'Brand Book', emoji: '📘', content: 'Conteúdo do Brand Book...' },
-  { id: '2', title: 'Highcharts - Minha Empresa', agentId: 'market-research', createdAt: '09/02/2026', type: 'Pesquisa', emoji: '📊', content: 'Conteúdo da pesquisa de mercado...' },
-  { id: '3', title: 'ICP Map - Minha Empresa', agentId: 'icp-architect', createdAt: '09/02/2026', type: 'ICP', emoji: '🎯', content: 'Conteúdo do mapa do ICP...' },
+  { id: '1', title: 'Brand Book - Minha Empresa', agentId: 'brand-book', createdAt: '09/02/2026', type: 'Brand Book', icon: 'brand-book', content: 'Conteúdo do Brand Book...' },
+  { id: '2', title: 'Highcharts - Minha Empresa', agentId: 'market-research', createdAt: '09/02/2026', type: 'Pesquisa', icon: 'market-research', content: 'Conteúdo da pesquisa de mercado...' },
+  { id: '3', title: 'ICP Map - Minha Empresa', agentId: 'icp-architect', createdAt: '09/02/2026', type: 'ICP', icon: 'icp-architect', content: 'Conteúdo do mapa do ICP...' },
 ];
 
 interface Props {
