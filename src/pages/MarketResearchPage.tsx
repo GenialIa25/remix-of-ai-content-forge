@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ArrowLeft, Search, Loader2, AlertTriangle, User, Image, Calendar, ListOrdered } from 'lucide-react';
+import { toast } from 'sonner';
 import { PlatformIcon, PLATFORM_LIST } from '@/components/market-research/PlatformIcons';
 import { useMarketResearch } from '@/hooks/useMarketResearch';
 import { SearchFilters, SearchType, Platform, PostType, SortBy, SortOrder, Post } from '@/types/marketResearch';
@@ -53,7 +54,34 @@ export default function MarketResearchPage({ onBack }: Props) {
     ? [{ value: 'all', label: 'Todos' }, { value: 'video', label: 'Vídeos' }, { value: 'shorts', label: 'Shorts' }]
     : [{ value: 'all', label: 'Todos' }, { value: 'video', label: 'Vídeos' }];
 
-  const handleSearch = () => {
+const handleSearch = async () => {
+    // Enviar para o webhook do Make.com
+    const payload = {
+      plataforma: platform === 'instagram' ? 'Instagram' : platform === 'tiktok' ? 'TikTok' : 'YouTube',
+      usuario: tab === 'profile' ? username : keyword,
+      tipo_post: postTypeOptions.find(o => o.value === postType)?.label || 'Todos',
+      periodo: PERIOD_OPTIONS.find(o => o.value === String(periodDays))?.label || 'Últimos 30 dias',
+      limite_posts: resultsLimit ? Math.min(20, Math.max(1, parseInt(resultsLimit, 10) || 20)) : 20,
+      tipo_pesquisa: tab === 'profile' ? 'perfil' : 'palavra-chave',
+    };
+
+    try {
+      const response = await fetch('https://hook.us1.make.com/rgp4sp2c0xxuv9hq3fft1my1jqxxytsg', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao enviar pesquisa');
+      }
+
+      toast.success('Pesquisa enviada com sucesso!');
+    } catch (err) {
+      toast.error('Erro ao enviar pesquisa. Tente novamente.');
+    }
+
+    // Continuar com a lógica existente de busca
     const parsedLimit = resultsLimit ? Math.min(20, Math.max(1, parseInt(resultsLimit, 10) || 20)) : undefined;
     const filters: SearchFilters = {
       searchType: tab, platform, username, keyword, postType, periodDays,
