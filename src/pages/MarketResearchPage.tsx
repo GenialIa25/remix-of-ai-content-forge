@@ -450,7 +450,7 @@ export default function MarketResearchPage({ onBack }: Props) {
             <div className="rounded-lg border border-destructive/20 bg-destructive/5 px-4 py-3 animate-in fade-in duration-300">
               <p className="text-sm text-destructive flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4" strokeWidth={1.5} />
-                Cenário de coleta não está ativo ou houve um erro. Verifique o Make.com.
+                Ops! Houve um erro. Tente novamente ou verifique com o administrador.
               </p>
             </div>
           )}
