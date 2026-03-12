@@ -10,9 +10,17 @@ interface DocItem {
   agentId: string;
   createdAt: string;
   type: string;
-  emoji: string;
+  icon: string;
   content: string;
 }
+
+const DOC_ICONS: Record<string, React.ReactNode> = {
+  'brand-book': <BookOpen className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />,
+  'market-research': <BarChart3 className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />,
+  'icp-architect': <Target className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />,
+};
+
+const fallbackIcon = <FileText className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />;
 
 const INITIAL_DOCS: DocItem[] = [
   { id: '1', title: 'Brand Book - Minha Empresa', agentId: 'brand-book', createdAt: '09/02/2026', type: 'Brand Book', emoji: '📘', content: 'Conteúdo do Brand Book...' },
