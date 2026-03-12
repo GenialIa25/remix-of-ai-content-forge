@@ -57,7 +57,7 @@ export default function DocumentsModal({ open, onClose }: Props) {
       agentId: doc.type,
       createdAt: new Date().toLocaleDateString('pt-BR'),
       type: typeLabel,
-      emoji: AGENTS.find(a => a.id === doc.type)?.emoji || '📄',
+      icon: doc.type,
       content: doc.content,
     };
     setDocs(prev => [newDoc, ...prev]);
