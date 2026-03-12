@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { ArrowLeft, Search, Loader2, AlertTriangle, User, Image, Calendar, ListOrdered, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { PlatformIcon, PLATFORM_LIST } from '@/components/market-research/PlatformIcons';
@@ -52,6 +52,53 @@ export default function MarketResearchPage({ onBack }: Props) {
   const [webhookError, setWebhookError] = useState(false);
   const [webhookStatus, setWebhookStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [isSearching, setIsSearching] = useState(false);
+  const [verifyingConnection, setVerifyingConnection] = useState(false);
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const stopPolling = useCallback(() => {
+    if (pollingRef.current) {
+      clearInterval(pollingRef.current);
+      pollingRef.current = null;
+    }
+  }, []);
+
+  const pollForCallback = useCallback((requestId: string) => {
+    const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+    const url = `https://${projectId}.supabase.co/functions/v1/pesquisa-status?requestId=${requestId}`;
+    
+    setVerifyingConnection(true);
+    let elapsed = 0;
+    const POLL_INTERVAL = 1000;
+    const TIMEOUT = 10000;
+
+    pollingRef.current = setInterval(async () => {
+      elapsed += POLL_INTERVAL;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.confirmed) {
+          stopPolling();
+          setVerifyingConnection(false);
+          setWebhookStatus('success');
+          setWebhookSent(true);
+          setTimeout(() => setWebhookStatus('idle'), 4000);
+          return;
+        }
+      } catch {
+        // Network error — continue polling
+      }
+
+      if (elapsed >= TIMEOUT) {
+        stopPolling();
+        setVerifyingConnection(false);
+        setWebhookStatus('error');
+        setWebhookError(true);
+        setIsSearching(false);
+      }
+    }, POLL_INTERVAL);
+  }, [stopPolling]);
 
   const postTypeOptions = platform === 'instagram'
     ? [
@@ -168,11 +215,9 @@ export default function MarketResearchPage({ onBack }: Props) {
       });
 
       if (!res.ok) throw new Error('Webhook error');
-      setWebhookStatus('success');
-      setWebhookSent(true);
 
-      // Hide success message after 4s — progress bar takes over
-      setTimeout(() => setWebhookStatus('idle'), 4000);
+      // Start polling for Make.com callback confirmation
+      pollForCallback(requestId);
     } catch (err) {
       setWebhookStatus('error');
       setWebhookError(true);
@@ -373,34 +418,44 @@ export default function MarketResearchPage({ onBack }: Props) {
           <div className="flex justify-end">
             <button
               onClick={handleSearch}
-              disabled={isSearching || loading}
+              disabled={isSearching || loading || verifyingConnection}
               className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-secondary hover:bg-secondary/80 text-foreground text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {(isSearching || loading) ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" strokeWidth={1.5} />}
-              {(isSearching || loading) ? 'Processando...' : 'Pesquisar'}
+              {(isSearching || loading || verifyingConnection) ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" strokeWidth={1.5} />}
+              {verifyingConnection ? 'Verificando...' : (isSearching || loading) ? 'Processando...' : 'Pesquisar'}
             </button>
           </div>
 
-          {/* Immediate webhook status feedback */}
-          {webhookStatus === 'success' && (
+          {/* Verifying connection status */}
+          {verifyingConnection && (
+            <div className="rounded-lg border border-border/40 bg-secondary/30 px-4 py-3 animate-in fade-in duration-300">
+              <p className="text-sm text-muted-foreground flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Verificando conexão...
+              </p>
+            </div>
+          )}
+
+          {/* Confirmed — success feedback */}
+          {webhookStatus === 'success' && !verifyingConnection && (
             <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 animate-in fade-in duration-300">
               <p className="text-sm text-primary flex items-center gap-2">
                 <Check className="w-4 h-4" strokeWidth={2} />
-                Solicitação enviada com sucesso! Aguarde enquanto coletamos os dados.
+                Conexão confirmada! Coletando dados...
               </p>
             </div>
           )}
 
-          {webhookStatus === 'error' && (
+          {webhookStatus === 'error' && !verifyingConnection && (
             <div className="rounded-lg border border-destructive/20 bg-destructive/5 px-4 py-3 animate-in fade-in duration-300">
               <p className="text-sm text-destructive flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4" strokeWidth={1.5} />
-                Falha ao enviar solicitação. Tente novamente ou acione o administrador.
+                Cenário de coleta não está ativo ou houve um erro. Verifique o Make.com.
               </p>
             </div>
           )}
 
-          {/* Progress Bar */}
+          {/* Progress Bar — only after confirmed */}
           <ResearchProgressBar
             active={webhookSent}
             onComplete={() => setWebhookSent(false)}
