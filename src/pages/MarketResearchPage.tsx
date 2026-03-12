@@ -157,7 +157,8 @@ export default function MarketResearchPage({ onBack }: Props) {
       toast.success('Pesquisa enviada com sucesso!');
       setWebhookSent(true);
     } catch (err) {
-      toast.error('Erro ao enviar pesquisa. Tente novamente.');
+      toast.error('Não foi possível completar a pesquisa. O sistema pode estar fora do ar. Tente novamente ou acione o administrador.');
+      return; // Don't show progress bar on error
     }
 
     const filters: SearchFilters = {
