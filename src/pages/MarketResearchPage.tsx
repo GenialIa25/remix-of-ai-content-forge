@@ -81,6 +81,28 @@ export default function MarketResearchPage({ onBack }: Props) {
 
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-[640px] mx-auto px-6 py-8 space-y-8">
+          {/* Intro section */}
+          <div className="space-y-4">
+            <h2 className="text-2xl text-foreground" style={{ fontFamily: "'ITC Garamond Std Lt Cond', serif" }}>
+              Análise de Competidores
+            </h2>
+            <div className="space-y-3">
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Envie as URLs dos perfis dos seus concorrentes e receba uma planilha completa com todas as transcrições e análises de conteúdo.
+              </p>
+              <ul className="space-y-1.5 text-sm text-muted-foreground">
+                <li className="flex items-start gap-2">
+                  <span className="text-amber-400 mt-0.5">•</span>
+                  <span>Acesso 24/7, use o quanto quiser</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-amber-400 mt-0.5">•</span>
+                  <span>Funciona para YouTube, Instagram e LinkedIn</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
           {/* Tabs */}
           <div className="flex items-center gap-6">
             <button
