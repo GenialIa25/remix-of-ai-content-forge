@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { Play, Clock, CheckCircle, Lock, ChevronRight, ChevronDown, GraduationCap, Loader2 } from "lucide-react";
+import { Play, Clock, CheckCircle, Lock, ChevronRight, ChevronDown, GraduationCap, Loader2, Settings } from "lucide-react";
 import { LoomEmbed } from "@/components/video/LoomEmbed";
 import { useLessons } from "@/hooks/useLessons";
+import AulasAdminPanel from "@/components/aulas/AulasAdminPanel";
 
 export default function AulasPage() {
-  const { modules, completedLessons, loading, getLessonsByModule, toggleCompleted } = useLessons();
+  const { modules, completedLessons, loading, getLessonsByModule, toggleCompleted, refetch } = useLessons();
   const [selectedLesson, setSelectedLesson] = useState<{ id: string; title: string; description: string | null; loom_id: string; duration: string | null; module_id: string; order_index: number } | null>(null);
   const [expandedModules, setExpandedModules] = useState<string[]>([]);
+  const [showAdmin, setShowAdmin] = useState(false);
 
   // Auto-expand first module when data loads
   if (modules.length > 0 && expandedModules.length === 0) {
@@ -40,12 +42,21 @@ export default function AulasPage() {
     <div className="flex h-full w-full overflow-hidden">
       {/* Lista de aulas */}
       <div className="w-[320px] shrink-0 border-r border-border bg-card flex flex-col overflow-hidden">
-        <div className="p-4 border-b border-border">
-          <h1 className="text-lg font-semibold text-foreground flex items-center gap-2">
-            <GraduationCap className="w-5 h-5" />
-            Aulas
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">Aprenda a usar a plataforma</p>
+        <div className="p-4 border-b border-border flex items-center justify-between">
+          <div>
+            <h1 className="text-lg font-semibold text-foreground flex items-center gap-2">
+              <GraduationCap className="w-5 h-5" />
+              Aulas
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">Aprenda a usar a plataforma</p>
+          </div>
+          <button
+            onClick={() => setShowAdmin(!showAdmin)}
+            className={`p-2 rounded-lg transition-colors ${showAdmin ? "bg-primary text-primary-foreground" : "hover:bg-secondary text-muted-foreground"}`}
+            title="Gerenciar aulas"
+          >
+            <Settings className="w-4 h-4" />
+          </button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-3 space-y-2">
@@ -107,9 +118,11 @@ export default function AulasPage() {
         </div>
       </div>
 
-      {/* Player de vídeo */}
+      {/* Admin panel or Video player */}
       <div className="flex-1 flex flex-col overflow-y-auto bg-background">
-        {selectedLesson ? (
+        {showAdmin ? (
+          <AulasAdminPanel modules={modules} getLessonsByModule={getLessonsByModule} onDataChanged={refetch} />
+        ) : selectedLesson ? (
           <>
             <div className="p-6">
               <LoomEmbed videoId={selectedLesson.loom_id} title={selectedLesson.title} />
