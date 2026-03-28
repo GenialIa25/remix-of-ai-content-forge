@@ -2,10 +2,12 @@ import { useState } from "react";
 import { Play, Clock, CheckCircle, Lock, ChevronRight, ChevronDown, GraduationCap, Loader2, Settings } from "lucide-react";
 import { LoomEmbed } from "@/components/video/LoomEmbed";
 import { useLessons } from "@/hooks/useLessons";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import AulasAdminPanel from "@/components/aulas/AulasAdminPanel";
 
 export default function AulasPage() {
   const { modules, completedLessons, loading, getLessonsByModule, toggleCompleted, refetch } = useLessons();
+  const isAdmin = useIsAdmin();
   const [selectedLesson, setSelectedLesson] = useState<{ id: string; title: string; description: string | null; loom_id: string; duration: string | null; module_id: string; order_index: number } | null>(null);
   const [expandedModules, setExpandedModules] = useState<string[]>([]);
   const [showAdmin, setShowAdmin] = useState(false);
