@@ -2,7 +2,7 @@ import { useState } from 'react';
 import gemzLogo from '@/assets/gemz-logo.png';
 import { AGENTS, AGENT_AVATARS } from '@/types';
 import { useChatStore } from '@/stores/chatStore';
-import { PanelLeft, Pencil, Search, Image, AppWindow, BookOpen, MessageSquare, X, FlaskConical, Sun, Moon, Home, Boxes, ClipboardCheck, GraduationCap, BarChart3, CalendarDays } from 'lucide-react';
+import { PanelLeft, Pencil, Search, AppWindow, BookOpen, MessageSquare, X, FlaskConical, Sun, Moon, Home, Boxes, ClipboardCheck, GraduationCap, BarChart3, CalendarDays } from 'lucide-react';
 import { useTheme } from '@/hooks/useTheme';
 import SearchModal from '@/components/modals/SearchModal';
 import ImagesModal from '@/components/modals/ImagesModal';
@@ -14,7 +14,6 @@ export default function Sidebar() {
   const { sidebarOpen, setSidebarOpen, activeAgentId, setActiveAgent, conversations, activeConversationId, setActiveConversation, setActivePage, activePage } = useChatStore();
   const isMobile = useIsMobile();
   const [searchOpen, setSearchOpen] = useState(false);
-  const [imagesOpen, setImagesOpen] = useState(false);
   const [appsOpen, setAppsOpen] = useState(false);
   const [docsOpen, setDocsOpen] = useState(false);
 
@@ -69,7 +68,6 @@ export default function Sidebar() {
         <NavItem icon={<Boxes className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="CreatorFounder™️ Kit" active={activePage === 'creator-kit'} onClick={() => { setActivePage('creator-kit'); if (isMobile) setSidebarOpen(false); }} />
         <NavItem icon={<FlaskConical className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="Pesquisa de Mercado" active={activePage === 'market-research'} onClick={() => { setActivePage('market-research'); if (isMobile) setSidebarOpen(false); }} />
         <NavItem icon={<Search className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="Buscar" onClick={() => setSearchOpen(true)} />
-        <NavItem icon={<Image className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="Imagens" onClick={() => setImagesOpen(true)} />
         <NavItem icon={<AppWindow className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="Aplicativos" onClick={() => setAppsOpen(true)} />
         <NavItem icon={<GraduationCap className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="Aulas" active={activePage === 'aulas'} onClick={() => { setActivePage('aulas'); if (isMobile) setSidebarOpen(false); }} />
         <NavItem icon={<CalendarDays className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="Calendário" active={activePage === 'calendario'} onClick={() => { setActivePage('calendario'); if (isMobile) setSidebarOpen(false); }} />
@@ -153,7 +151,6 @@ export default function Sidebar() {
         sidebarContent
       )}
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
-      <ImagesModal open={imagesOpen} onClose={() => setImagesOpen(false)} />
       <AppsModal open={appsOpen} onClose={() => setAppsOpen(false)} />
       <DocumentsModal open={docsOpen} onClose={() => setDocsOpen(false)} />
     </>

@@ -11,31 +11,75 @@ serve(async (req) => {
   }
 
   try {
+    const API_KEY = Deno.env.get("ADDEVENT_API_KEY");
     const CALENDAR_ID = Deno.env.get("ADDEVENT_CALENDAR_ID");
 
-    if (!CALENDAR_ID) {
+    if (!API_KEY || !CALENDAR_ID) {
       return new Response(
-        JSON.stringify({ error: "ADDEVENT_CALENDAR_ID não configurado" }),
+        JSON.stringify({ error: "ADDEVENT_API_KEY ou ADDEVENT_CALENDAR_ID não configurado" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const ICAL_URL = `https://www.addevent.com/calendar/${CALENDAR_ID}.ics`;
-    const icalResponse = await fetch(ICAL_URL);
+    // Try AddEvent API v2
+    const eventsUrl = `https://api.addevent.com/calevent/v2/calendars/${CALENDAR_ID}/events`;
+    const eventsRes = await fetch(eventsUrl, {
+      headers: {
+        Authorization: `Bearer ${API_KEY}`,
+        Accept: "application/json",
+      },
+    });
 
-    if (!icalResponse.ok) {
+    if (!eventsRes.ok) {
+      const errText = await eventsRes.text();
+      let errMsg = `AddEvent API retornou status ${eventsRes.status}`;
+      
+      try {
+        const errJson = JSON.parse(errText);
+        if (errJson.error_message) {
+          errMsg = errJson.error_message;
+          if (errMsg.includes("plan does not allow")) {
+            errMsg = "O plano da sua conta AddEvent não permite acesso à API. Faça upgrade do plano no dashboard do AddEvent ou torne o calendário público para usar o feed iCal.";
+          }
+        }
+      } catch {}
+
+      // Fallback: try iCal feed (public calendar)
+      console.log("API failed, trying iCal feed...");
+      const icalUrl = `https://www.addevent.com/calendar/${CALENDAR_ID}.ics`;
+      const icalRes = await fetch(icalUrl);
+      const icalText = await icalRes.text();
+
+      if (icalText.includes("BEGIN:VCALENDAR")) {
+        const events = parseICalToJSON(icalText);
+        return new Response(JSON.stringify(events), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Check if calendar is not public
+      if (icalText.includes("unavailable to view")) {
+        errMsg = "O calendário AddEvent não está público. Vá em AddEvent > Settings do calendário e ative a opção de torná-lo público/publicado. Depois os eventos aparecerão automaticamente aqui.";
+      }
+
       return new Response(
-        JSON.stringify({ error: `Erro ao buscar calendário: ${icalResponse.status}` }),
-        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ error: errMsg }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const icalText = await icalResponse.text();
-    console.log("iCal length:", icalText.length);
-    console.log("iCal preview:", icalText.slice(0, 500));
-    console.log("Contains VEVENT:", icalText.includes("BEGIN:VEVENT"));
-    const events = parseICalToJSON(icalText);
-    console.log("Parsed events count:", events.length);
+    const data = await eventsRes.json();
+    const rawEvents = data.data || data.events || [];
+    const events = rawEvents.map((e: any) => ({
+      id: String(e.id || crypto.randomUUID()),
+      title: e.title || e.summary || e.name || "",
+      description: e.description || e.notes || null,
+      start: e.date_start || e.start_date || e.start || null,
+      end: e.date_end || e.end_date || e.end || null,
+      location: e.location || null,
+      url: e.url || e.link || null,
+      timezone: e.timezone || null,
+    })).filter((e: any) => e.title);
 
     return new Response(JSON.stringify(events), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -55,43 +99,34 @@ function parseICalToJSON(icalText: string) {
 
   for (let i = 1; i < eventBlocks.length; i++) {
     const block = eventBlocks[i].split("END:VEVENT")[0];
-
-    // Unfold lines (RFC 5545: lines starting with space/tab are continuations)
     const unfolded = block.replace(/\r?\n[ \t]/g, "");
 
     const getField = (name: string): string | null => {
       const regex = new RegExp(`^${name}(?:;[^:]*)?:(.+)$`, "m");
       const match = unfolded.match(regex);
-      return match ? match[1].replace(/\\n/g, "\n").replace(/\\,/g, ",").replace(/\\\\/g, "\\").trim() : null;
+      return match ? match[1].replace(/\\n/g, "\n").replace(/\\,/g, ",").trim() : null;
     };
 
-    const parseICalDate = (dateStr: string | null): string | null => {
-      if (!dateStr) return null;
-      const clean = dateStr.replace(/[^0-9TZ]/g, "");
-      if (clean.length < 8) return null;
-      const year = clean.slice(0, 4);
-      const month = clean.slice(4, 6);
-      const day = clean.slice(6, 8);
-      const hour = clean.length > 8 ? clean.slice(9, 11) || "00" : "00";
-      const min = clean.length > 8 ? clean.slice(11, 13) || "00" : "00";
-      return `${year}-${month}-${day}T${hour}:${min}:00`;
+    const parseDate = (s: string | null): string | null => {
+      if (!s) return null;
+      const c = s.replace(/[^0-9TZ]/g, "");
+      if (c.length < 8) return null;
+      return `${c.slice(0,4)}-${c.slice(4,6)}-${c.slice(6,8)}T${c.slice(9,11)||"00"}:${c.slice(11,13)||"00"}:00`;
     };
 
     const title = getField("SUMMARY");
-    const start = parseICalDate(getField("DTSTART"));
-
+    const start = parseDate(getField("DTSTART"));
     if (title && start) {
       events.push({
         id: getField("UID") || `event-${i}`,
         title,
         description: getField("DESCRIPTION"),
         start,
-        end: parseICalDate(getField("DTEND")),
+        end: parseDate(getField("DTEND")),
         location: getField("LOCATION"),
         url: getField("URL"),
       });
     }
   }
-
   return events;
 }
