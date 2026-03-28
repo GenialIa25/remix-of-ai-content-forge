@@ -52,7 +52,7 @@ export default function AulasAdminPanel({ modules, getLessonsByModule, onDataCha
         title: moduleForm.title,
         description: moduleForm.description || null,
       }).eq("id", id);
-      if (error) { toast.error("Erro ao atualizar módulo"); return; }
+      if (error) { console.error("Erro ao atualizar módulo:", error); toast.error("Erro ao atualizar módulo: " + error.message); return; }
       toast.success("Módulo atualizado");
     } else {
       const maxOrder = modules.length > 0 ? Math.max(...modules.map(m => m.order_index)) + 1 : 1;
