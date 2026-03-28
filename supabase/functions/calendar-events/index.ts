@@ -14,108 +14,84 @@ serve(async (req) => {
     const API_KEY = Deno.env.get("ADDEVENT_API_KEY");
     const CALENDAR_ID = Deno.env.get("ADDEVENT_CALENDAR_ID");
 
-    if (!API_KEY) {
+    if (!API_KEY || !CALENDAR_ID) {
       return new Response(
-        JSON.stringify({ error: "ADDEVENT_API_KEY não configurado" }),
+        JSON.stringify({ error: "ADDEVENT_API_KEY ou ADDEVENT_CALENDAR_ID não configurado" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    if (!CALENDAR_ID) {
-      return new Response(
-        JSON.stringify({ error: "ADDEVENT_CALENDAR_ID não configurado" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    // Step 1: List calendars to verify API key and find correct calendar
+    const calListUrl = `https://www.addevent.com/api/v1/me/calendars/list/?token=${API_KEY}`;
+    console.log("Listing calendars...");
+    const calListRes = await fetch(calListUrl);
+    const calListText = await calListRes.text();
+    console.log("Calendar list status:", calListRes.status, "body:", calListText.slice(0, 1000));
 
-    console.log("API_KEY length:", API_KEY.length);
-    console.log("CALENDAR_ID:", CALENDAR_ID);
+    let calendarApiId: string | null = null;
 
-    // Try AddEvent API v1 (token as query param) first, then v2
-    const urls = [
-      `https://www.addevent.com/api/v1/me/calendars/events/list/?token=${API_KEY}&calendar_id=${CALENDAR_ID}`,
-      `https://api.addevent.com/calevent/v2/calendars/${CALENDAR_ID}/events`,
-    ];
-
-    let events: any[] = [];
-    let lastError = "";
-
-    for (const url of urls) {
-      console.log("Trying:", url.replace(API_KEY, "***"));
-      const isV2 = url.includes("api.addevent.com");
-
-      const response = await fetch(url, {
-        headers: isV2
-          ? { Authorization: `Bearer ${API_KEY}`, Accept: "application/json" }
-          : { Accept: "application/json" },
-      });
-
-      const text = await response.text();
-      console.log("Response status:", response.status, "body length:", text.length, "preview:", text.slice(0, 300));
-
-      if (!response.ok) {
-        lastError = `${response.status}: ${text.slice(0, 200)}`;
-        continue;
-      }
-
+    if (calListRes.ok) {
       try {
-        const data = JSON.parse(text);
-        // v1 format
-        if (data.events) {
-          events = data.events.map((e: any) => ({
-            id: e.id || e.uid || crypto.randomUUID(),
-            title: e.title || e.summary || "",
-            description: e.description || null,
-            start: e.date_start || e.start_date || e.start || null,
-            end: e.date_end || e.end_date || e.end || null,
-            location: e.location || null,
-            url: e.url || null,
-            timezone: e.timezone || null,
-          }));
-          break;
+        const calData = JSON.parse(calListText);
+        console.log("Calendar data keys:", Object.keys(calData));
+        if (calData.calendars) {
+          console.log("Found calendars:", calData.calendars.length);
+          for (const cal of calData.calendars) {
+            console.log("Calendar:", JSON.stringify(cal).slice(0, 200));
+            // Match by uniquekey, id, or part of the ID
+            if (
+              cal.uniquekey === CALENDAR_ID ||
+              cal.id === CALENDAR_ID ||
+              String(cal.id) === CALENDAR_ID.replace('cal_', '') ||
+              cal.uniquekey?.includes(CALENDAR_ID.replace('cal_', ''))
+            ) {
+              calendarApiId = cal.id;
+              break;
+            }
+          }
+          // If not found by ID match, use the first calendar
+          if (!calendarApiId && calData.calendars.length > 0) {
+            calendarApiId = calData.calendars[0].id;
+            console.log("Using first calendar:", calendarApiId);
+          }
         }
-        // v2 format
-        if (data.data) {
-          events = data.data.map((e: any) => ({
-            id: e.id || crypto.randomUUID(),
-            title: e.title || e.summary || e.name || "",
-            description: e.description || null,
-            start: e.start_date || e.date_start || null,
-            end: e.end_date || e.date_end || null,
-            location: e.location || null,
-            url: e.url || null,
-            timezone: e.timezone || null,
-          }));
-          break;
-        }
-        // Try as array
-        if (Array.isArray(data)) {
-          events = data.map((e: any) => ({
-            id: e.id || crypto.randomUUID(),
-            title: e.title || e.summary || "",
-            description: e.description || null,
-            start: e.date_start || e.start_date || e.start || null,
-            end: e.date_end || e.end_date || e.end || null,
-            location: e.location || null,
-            url: e.url || null,
-          }));
-          break;
-        }
-
-        // Unknown format - log and continue
-        console.log("Unknown data format, keys:", Object.keys(data));
-        lastError = "Unknown response format";
-      } catch (parseErr) {
-        console.error("Parse error:", parseErr);
-        lastError = `Parse error: ${parseErr}`;
+      } catch (e) {
+        console.error("Parse calendars error:", e);
       }
     }
 
-    console.log("Final events count:", events.length);
+    // Step 2: List events
+    let events: any[] = [];
 
-    if (events.length === 0 && lastError) {
-      console.error("All endpoints failed. Last error:", lastError);
+    if (calendarApiId) {
+      const eventsUrl = `https://www.addevent.com/api/v1/me/calendars/events/list/?token=${API_KEY}&calendar_id=${calendarApiId}`;
+      console.log("Fetching events for calendar:", calendarApiId);
+      const eventsRes = await fetch(eventsUrl);
+      const eventsText = await eventsRes.text();
+      console.log("Events status:", eventsRes.status, "body:", eventsText.slice(0, 500));
+
+      if (eventsRes.ok) {
+        try {
+          const eventsData = JSON.parse(eventsText);
+          const rawEvents = eventsData.events || eventsData.data || [];
+          events = rawEvents.map((e: any) => ({
+            id: String(e.id || e.uid || crypto.randomUUID()),
+            title: e.title || e.summary || "",
+            description: e.description || e.notes || null,
+            start: e.date_start || e.start_date || e.start || null,
+            end: e.date_end || e.end_date || e.end || null,
+            location: e.location || null,
+            url: e.url || e.link || null,
+            timezone: e.timezone || null,
+            allday: e.all_day_event === "true" || e.allday === true,
+          }));
+        } catch (e) {
+          console.error("Parse events error:", e);
+        }
+      }
     }
+
+    console.log("Final events:", events.length);
 
     return new Response(JSON.stringify(events), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
