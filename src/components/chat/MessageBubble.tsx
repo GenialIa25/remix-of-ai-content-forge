@@ -36,7 +36,7 @@ export default function MessageBubble({ message, agentId }: Props) {
       <div className="flex items-center gap-2 mb-2">
         <span
           className="w-7 h-7 rounded-full flex items-center justify-center text-sm"
-          style={{ background: (agent?.color || '#10a37f') + '22' }}
+          style={{ background: (agent?.color || '#eff5ce') + '66' }}
         >
           {agent?.emoji || '🤖'}
         </span>
