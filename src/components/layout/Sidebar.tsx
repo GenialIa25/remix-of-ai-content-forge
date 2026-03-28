@@ -14,7 +14,7 @@ export default function Sidebar() {
   const { sidebarOpen, setSidebarOpen, activeAgentId, setActiveAgent, conversations, activeConversationId, setActiveConversation, setActivePage, activePage } = useChatStore();
   const isMobile = useIsMobile();
   const [searchOpen, setSearchOpen] = useState(false);
-  const [imagesOpen, setImagesOpen] = useState(false);
+  const [appsOpen, setAppsOpen] = useState(false);
   const [appsOpen, setAppsOpen] = useState(false);
   const [docsOpen, setDocsOpen] = useState(false);
 
