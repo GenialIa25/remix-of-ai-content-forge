@@ -8,7 +8,7 @@ interface ChatState {
   sidebarOpen: boolean;
   selectedModel: string;
   thinkingMode: boolean;
-  activePage: 'home' | 'chat' | 'market-research' | 'creator-kit' | 'implementation';
+  activePage: 'home' | 'chat' | 'market-research' | 'creator-kit' | 'implementation' | 'aulas';
 
   setActiveAgent: (agentId: string) => void;
   setSidebarOpen: (open: boolean) => void;
