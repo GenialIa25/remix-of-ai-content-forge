@@ -21,72 +21,71 @@ serve(async (req) => {
       );
     }
 
-    // Step 1: List calendars to verify API key and find correct calendar
-    const calListUrl = `https://www.addevent.com/api/v1/me/calendars/list/?token=${API_KEY}`;
-    console.log("Listing calendars...");
-    const calListRes = await fetch(calListUrl);
-    const calListText = await calListRes.text();
-    console.log("Calendar list status:", calListRes.status, "body:", calListText.slice(0, 1000));
+    // Try multiple AddEvent API endpoints
+    const endpoints = [
+      // v2 - list all events
+      { url: "https://api.addevent.com/calevent/v2/events", auth: "bearer" },
+      // v2 - list calendars  
+      { url: "https://api.addevent.com/calevent/v2/calendars", auth: "bearer" },
+      // v2 - calendar events
+      { url: `https://api.addevent.com/calevent/v2/calendars/${CALENDAR_ID}/events`, auth: "bearer" },
+    ];
 
-    let calendarApiId: string | null = null;
-
-    if (calListRes.ok) {
-      try {
-        const calData = JSON.parse(calListText);
-        console.log("Calendar data keys:", Object.keys(calData));
-        if (calData.calendars) {
-          console.log("Found calendars:", calData.calendars.length);
-          for (const cal of calData.calendars) {
-            console.log("Calendar:", JSON.stringify(cal).slice(0, 200));
-            // Match by uniquekey, id, or part of the ID
-            if (
-              cal.uniquekey === CALENDAR_ID ||
-              cal.id === CALENDAR_ID ||
-              String(cal.id) === CALENDAR_ID.replace('cal_', '') ||
-              cal.uniquekey?.includes(CALENDAR_ID.replace('cal_', ''))
-            ) {
-              calendarApiId = cal.id;
-              break;
-            }
-          }
-          // If not found by ID match, use the first calendar
-          if (!calendarApiId && calData.calendars.length > 0) {
-            calendarApiId = calData.calendars[0].id;
-            console.log("Using first calendar:", calendarApiId);
-          }
-        }
-      } catch (e) {
-        console.error("Parse calendars error:", e);
-      }
-    }
-
-    // Step 2: List events
     let events: any[] = [];
 
-    if (calendarApiId) {
-      const eventsUrl = `https://www.addevent.com/api/v1/me/calendars/events/list/?token=${API_KEY}&calendar_id=${calendarApiId}`;
-      console.log("Fetching events for calendar:", calendarApiId);
-      const eventsRes = await fetch(eventsUrl);
-      const eventsText = await eventsRes.text();
-      console.log("Events status:", eventsRes.status, "body:", eventsText.slice(0, 500));
+    for (const ep of endpoints) {
+      console.log("Trying:", ep.url);
+      const headers: Record<string, string> = { Accept: "application/json" };
+      if (ep.auth === "bearer") {
+        headers["Authorization"] = `Bearer ${API_KEY}`;
+      }
 
-      if (eventsRes.ok) {
+      const res = await fetch(ep.url, { headers });
+      const text = await res.text();
+      console.log(`Status: ${res.status}, Body (${text.length}): ${text.slice(0, 500)}`);
+
+      if (res.ok && text.length > 2) {
         try {
-          const eventsData = JSON.parse(eventsText);
-          const rawEvents = eventsData.events || eventsData.data || [];
-          events = rawEvents.map((e: any) => ({
-            id: String(e.id || e.uid || crypto.randomUUID()),
-            title: e.title || e.summary || "",
-            description: e.description || e.notes || null,
-            start: e.date_start || e.start_date || e.start || null,
-            end: e.date_end || e.end_date || e.end || null,
-            location: e.location || null,
-            url: e.url || e.link || null,
-            timezone: e.timezone || null,
-            allday: e.all_day_event === "true" || e.allday === true,
-          }));
+          const data = JSON.parse(text);
+          
+          // If this is a calendars list, find our calendar and get its events
+          if (data.data && data.data[0]?.type === "calendar") {
+            console.log("Found calendars:", data.data.length);
+            for (const cal of data.data) {
+              console.log(`Calendar: id=${cal.id}, title=${cal.title || cal.name}`);
+            }
+            // Get events from the first/matching calendar
+            const targetCal = data.data.find((c: any) => 
+              c.uniquekey === CALENDAR_ID || 
+              c.id === CALENDAR_ID ||
+              String(c.id) === CALENDAR_ID
+            ) || data.data[0];
+            
+            if (targetCal) {
+              const evUrl = `https://api.addevent.com/calevent/v2/calendars/${targetCal.id}/events`;
+              console.log("Fetching events from:", evUrl);
+              const evRes = await fetch(evUrl, { headers });
+              const evText = await evRes.text();
+              console.log(`Events status: ${evRes.status}, body: ${evText.slice(0, 500)}`);
+              if (evRes.ok) {
+                const evData = JSON.parse(evText);
+                events = mapEvents(evData.data || evData.events || []);
+              }
+            }
+            break;
+          }
+          
+          // If this is an events list directly
+          if (data.data && Array.isArray(data.data)) {
+            events = mapEvents(data.data);
+            break;
+          }
+          if (data.events && Array.isArray(data.events)) {
+            events = mapEvents(data.events);
+            break;
+          }
         } catch (e) {
-          console.error("Parse events error:", e);
+          console.error("Parse error:", e);
         }
       }
     }
@@ -104,3 +103,17 @@ serve(async (req) => {
     );
   }
 });
+
+function mapEvents(rawEvents: any[]): any[] {
+  return rawEvents.map((e: any) => ({
+    id: String(e.id || e.uid || crypto.randomUUID()),
+    title: e.title || e.summary || e.name || "",
+    description: e.description || e.notes || null,
+    start: e.date_start || e.start_date || e.start || e.date_start_date || null,
+    end: e.date_end || e.end_date || e.end || e.date_end_date || null,
+    location: e.location || null,
+    url: e.url || e.link || null,
+    timezone: e.timezone || null,
+    allday: e.all_day_event === "true" || e.allday === true || e.all_day === true,
+  })).filter((e: any) => e.title);
+}
