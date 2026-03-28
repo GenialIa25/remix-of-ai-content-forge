@@ -74,8 +74,9 @@ export default function MetricsDashboard() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-xl font-bold text-foreground">Dashboard de métricas</h1>
-            <p className="text-sm text-muted-foreground">{user?.email}</p>
+            <h1 className="text-2xl text-foreground" style={{ fontFamily: "'ITC Garamond Std Lt Cond', serif" }}>
+              Dashboard de Métricas
+            </h1>
           </div>
           <div className="flex items-center gap-3">
             <Select value={period} onValueChange={setPeriod}>
@@ -112,6 +113,32 @@ export default function MetricsDashboard() {
                 </SelectGroup>
               </SelectContent>
             </Select>
+          </div>
+        </div>
+
+        {/* Description box */}
+        <div className="rounded-xl border border-border bg-card p-6 space-y-4">
+          <h2 className="text-2xl text-foreground" style={{ fontFamily: "'ITC Garamond Std Lt Cond', serif" }}>
+            Dashboard de Métricas
+          </h2>
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Acompanhe a evolução do seu negócio mês a mês. Selecione o período desejado para visualizar receita, publicidade, audiência, clientes e saúde do negócio.
+            </p>
+            <ul className="space-y-1.5 text-sm text-muted-foreground">
+              <li className="flex items-start gap-2">
+                <span className="text-amber-400 mt-0.5">•</span>
+                <span>Compare com o mês anterior automaticamente</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-amber-400 mt-0.5">•</span>
+                <span>Filtre por mês, trimestre ou período personalizado</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-amber-400 mt-0.5">•</span>
+                <span>Métricas calculadas automaticamente a partir dos seus dados</span>
+              </li>
+            </ul>
           </div>
         </div>
 
