@@ -1,0 +1,189 @@
+import { useState, useMemo } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useMetrics } from '@/hooks/useMetrics';
+import { MetricCard } from '@/components/metrics/MetricCard';
+import { MetricsSection } from '@/components/metrics/MetricsSection';
+import { RevenueChart } from '@/components/metrics/RevenueChart';
+import { RoasChart } from '@/components/metrics/RoasChart';
+import { ClientsFunnel } from '@/components/metrics/ClientsFunnel';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel, SelectSeparator } from '@/components/ui/select';
+import { Loader2 } from 'lucide-react';
+
+function buildPeriodOptions() {
+  const now = new Date();
+  const curYear = now.getFullYear();
+  const curMonth = now.getMonth() + 1;
+  const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+
+  const months: { label: string; value: string }[] = [];
+  for (let i = 0; i < 12; i++) {
+    let m = curMonth - i;
+    let y = curYear;
+    while (m <= 0) { m += 12; y--; }
+    months.push({ label: `${monthNames[m - 1]} ${y}`, value: `${y}-${m}` });
+  }
+
+  const ranges = [
+    { label: 'Últimos 3 meses', value: 'last-3' },
+    { label: 'Últimos 6 meses', value: 'last-6' },
+    { label: 'Últimos 12 meses', value: 'last-12' },
+  ];
+
+  const quarters: { label: string; value: string }[] = [];
+  for (let q = Math.ceil(curMonth / 3); q >= 1; q--) {
+    quarters.push({ label: `Q${q} ${curYear}`, value: `${curYear}-Q${q}` });
+  }
+
+  const years = [
+    { label: `${curYear}`, value: `${curYear}` },
+    { label: `${curYear - 1}`, value: `${curYear - 1}` },
+  ];
+
+  return { months, ranges, quarters, years };
+}
+
+export default function MetricsDashboard() {
+  const { user } = useAuth();
+  const now = new Date();
+  const defaultPeriod = `${now.getFullYear()}-${now.getMonth() + 1}`;
+  const [period, setPeriod] = useState(defaultPeriod);
+  const { metrics, previousMetrics, history, loading, calculateChange } = useMetrics(period);
+  const options = useMemo(() => buildPeriodOptions(), []);
+
+  const chg = (field: keyof NonNullable<typeof metrics>) =>
+    calculateChange(
+      (metrics as any)?.[field],
+      (previousMetrics as any)?.[field]
+    );
+
+  const v = (field: keyof NonNullable<typeof metrics>): number =>
+    (metrics as any)?.[field] ?? 0;
+
+  if (loading) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex-1 overflow-y-auto">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-xl font-bold text-foreground">Dashboard de métricas</h1>
+            <p className="text-sm text-muted-foreground">{user?.email}</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Select value={period} onValueChange={setPeriod}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="Selecionar período" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Meses</SelectLabel>
+                  {options.months.map(o => (
+                    <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                  ))}
+                </SelectGroup>
+                <SelectSeparator />
+                <SelectGroup>
+                  <SelectLabel>Períodos</SelectLabel>
+                  {options.ranges.map(o => (
+                    <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                  ))}
+                </SelectGroup>
+                <SelectSeparator />
+                <SelectGroup>
+                  <SelectLabel>Quarters</SelectLabel>
+                  {options.quarters.map(o => (
+                    <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                  ))}
+                </SelectGroup>
+                <SelectSeparator />
+                <SelectGroup>
+                  <SelectLabel>Anual</SelectLabel>
+                  {options.years.map(o => (
+                    <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {!metrics ? (
+          <div className="rounded-[10px] bg-secondary border border-border p-8 text-center">
+            <p className="text-muted-foreground">Nenhuma métrica encontrada para este período.</p>
+          </div>
+        ) : (
+          <>
+            {/* Change indicator */}
+            <p className="text-xs text-muted-foreground">
+              <span style={{ color: '#5a6b2a' }}>▲</span>{' '}
+              <span className="text-destructive">▼</span>{' '}
+              vs mês anterior
+            </p>
+
+            {/* 1. Receita e Finanças */}
+            <MetricsSection title="Receita e Finanças" icon="💰" columns={5}>
+              <MetricCard title="Total NEW Revenue" value={v('total_new_revenue')} format="currency" change={chg('total_new_revenue')} />
+              <MetricCard title="Total Cash Collected" value={v('total_cash_collected')} format="currency" change={chg('total_cash_collected')} />
+              <MetricCard title="MRR" value={v('monthly_recurring_revenue')} format="currency" change={chg('monthly_recurring_revenue')} />
+              <MetricCard title="Expenses" value={v('expenses')} format="currency" change={chg('expenses')} />
+              <MetricCard title="PROFIT" value={v('profit')} format="currency" change={chg('profit')} highlight />
+            </MetricsSection>
+
+            {/* 2. Revenue Chart */}
+            <RevenueChart history={history} />
+
+            {/* 3. Publicidade */}
+            <MetricsSection title="Publicidade" icon="📣" columns={6}>
+              <MetricCard title="Ad Spend" value={v('ad_spend')} format="currency" change={chg('ad_spend')} />
+              <MetricCard title="Daily Ad Spend" value={v('daily_ad_spend')} format="currency" change={chg('daily_ad_spend')} />
+              <MetricCard title="Reach (IG)" value={v('advertising_reach_ig')} change={chg('advertising_reach_ig')} />
+              <MetricCard title="Impressions (IG)" value={v('advertising_impressions_ig')} change={chg('advertising_impressions_ig')} />
+              <MetricCard title="CPM" value={v('cpm')} format="currency" change={chg('cpm')} />
+              <MetricCard title="ROAS" value={`${v('roas')}x`} change={chg('roas')} highlight />
+            </MetricsSection>
+
+            {/* 4. ROAS Chart */}
+            <RoasChart history={history} />
+
+            {/* 5. Short Form */}
+            <MetricsSection title="Short Form" icon="📱" columns={4}>
+              <MetricCard title="Channel Size" value={v('short_form_channel_size')} change={chg('short_form_channel_size')} />
+              <MetricCard title="Total Reach / Impressions" value={v('total_reach_ig_impressions_li')} change={chg('total_reach_ig_impressions_li')} />
+              <MetricCard title="Total Posts Made" value={v('total_posts_made')} change={chg('total_posts_made')} />
+              <MetricCard
+                title="Reach per Post"
+                value={v('total_posts_made') > 0 ? Math.round(v('total_reach_ig_impressions_li') / v('total_posts_made')) : 0}
+              />
+            </MetricsSection>
+
+            {/* 6. Long Form */}
+            <MetricsSection title="Long Form" icon="🎥" columns={5}>
+              <MetricCard title="Channel Size" value={v('long_form_channel_size')} change={chg('long_form_channel_size')} />
+              <MetricCard title="Monthly Audience" value={v('long_form_monthly_audience')} change={chg('long_form_monthly_audience')} />
+              <MetricCard title="YouTube Views" value={v('youtube_total_views')} change={chg('youtube_total_views')} />
+              <MetricCard title="YouTube Hours" value={v('youtube_total_hours')} change={chg('youtube_total_hours')} />
+              <MetricCard title="Videos / Podcasts" value={v('total_videos_podcasts_made')} change={chg('total_videos_podcasts_made')} />
+            </MetricsSection>
+
+            {/* 7. Email */}
+            <MetricsSection title="Email Marketing" icon="📧" columns={3}>
+              <MetricCard title="Email List Size" value={v('email_list_size')} change={chg('email_list_size')} />
+              <MetricCard title="New Subscribers" value={v('new_subscribers')} change={chg('new_subscribers')} />
+              <MetricCard title="Net New Subscribers" value={v('net_new_subscribers')} change={chg('net_new_subscribers')} />
+            </MetricsSection>
+
+            {/* 8. Clientes / Funil */}
+            <ClientsFunnel metrics={metrics} change={chg('new_clients')} />
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
