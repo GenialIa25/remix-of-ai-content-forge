@@ -3,7 +3,9 @@ import { Play, Clock, CheckCircle, Lock, ChevronRight, ChevronDown, GraduationCa
 import { LoomEmbed } from "@/components/video/LoomEmbed";
 import { useLessons } from "@/hooks/useLessons";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useAuth } from "@/contexts/AuthContext";
 import AulasAdminPanel from "@/components/aulas/AulasAdminPanel";
+import { toast } from "sonner";
 
 export default function AulasPage() {
   const { modules, completedLessons, loading, getLessonsByModule, toggleCompleted, refetch } = useLessons();
