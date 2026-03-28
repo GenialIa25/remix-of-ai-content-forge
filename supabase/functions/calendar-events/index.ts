@@ -21,76 +21,65 @@ serve(async (req) => {
       );
     }
 
-    // Try multiple AddEvent API endpoints
-    const endpoints = [
-      // v2 - list all events
-      { url: "https://api.addevent.com/calevent/v2/events", auth: "bearer" },
-      // v2 - list calendars  
-      { url: "https://api.addevent.com/calevent/v2/calendars", auth: "bearer" },
-      // v2 - calendar events
-      { url: `https://api.addevent.com/calevent/v2/calendars/${CALENDAR_ID}/events`, auth: "bearer" },
-    ];
+    // Try AddEvent API v2
+    const eventsUrl = `https://api.addevent.com/calevent/v2/calendars/${CALENDAR_ID}/events`;
+    const eventsRes = await fetch(eventsUrl, {
+      headers: {
+        Authorization: `Bearer ${API_KEY}`,
+        Accept: "application/json",
+      },
+    });
 
-    let events: any[] = [];
-
-    for (const ep of endpoints) {
-      console.log("Trying:", ep.url);
-      const headers: Record<string, string> = { Accept: "application/json" };
-      if (ep.auth === "bearer") {
-        headers["Authorization"] = `Bearer ${API_KEY}`;
-      }
-
-      const res = await fetch(ep.url, { headers });
-      const text = await res.text();
-      console.log(`Status: ${res.status}, Body (${text.length}): ${text.slice(0, 500)}`);
-
-      if (res.ok && text.length > 2) {
-        try {
-          const data = JSON.parse(text);
-          
-          // If this is a calendars list, find our calendar and get its events
-          if (data.data && data.data[0]?.type === "calendar") {
-            console.log("Found calendars:", data.data.length);
-            for (const cal of data.data) {
-              console.log(`Calendar: id=${cal.id}, title=${cal.title || cal.name}`);
-            }
-            // Get events from the first/matching calendar
-            const targetCal = data.data.find((c: any) => 
-              c.uniquekey === CALENDAR_ID || 
-              c.id === CALENDAR_ID ||
-              String(c.id) === CALENDAR_ID
-            ) || data.data[0];
-            
-            if (targetCal) {
-              const evUrl = `https://api.addevent.com/calevent/v2/calendars/${targetCal.id}/events`;
-              console.log("Fetching events from:", evUrl);
-              const evRes = await fetch(evUrl, { headers });
-              const evText = await evRes.text();
-              console.log(`Events status: ${evRes.status}, body: ${evText.slice(0, 500)}`);
-              if (evRes.ok) {
-                const evData = JSON.parse(evText);
-                events = mapEvents(evData.data || evData.events || []);
-              }
-            }
-            break;
+    if (!eventsRes.ok) {
+      const errText = await eventsRes.text();
+      let errMsg = `AddEvent API retornou status ${eventsRes.status}`;
+      
+      try {
+        const errJson = JSON.parse(errText);
+        if (errJson.error_message) {
+          errMsg = errJson.error_message;
+          if (errMsg.includes("plan does not allow")) {
+            errMsg = "O plano da sua conta AddEvent não permite acesso à API. Faça upgrade do plano no dashboard do AddEvent ou torne o calendário público para usar o feed iCal.";
           }
-          
-          // If this is an events list directly
-          if (data.data && Array.isArray(data.data)) {
-            events = mapEvents(data.data);
-            break;
-          }
-          if (data.events && Array.isArray(data.events)) {
-            events = mapEvents(data.events);
-            break;
-          }
-        } catch (e) {
-          console.error("Parse error:", e);
         }
+      } catch {}
+
+      // Fallback: try iCal feed (public calendar)
+      console.log("API failed, trying iCal feed...");
+      const icalUrl = `https://www.addevent.com/calendar/${CALENDAR_ID}.ics`;
+      const icalRes = await fetch(icalUrl);
+      const icalText = await icalRes.text();
+
+      if (icalText.includes("BEGIN:VCALENDAR")) {
+        const events = parseICalToJSON(icalText);
+        return new Response(JSON.stringify(events), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
+
+      // Check if calendar is not public
+      if (icalText.includes("unavailable to view")) {
+        errMsg = "O calendário AddEvent não está público. Vá em AddEvent > Settings do calendário e ative a opção de torná-lo público/publicado. Depois os eventos aparecerão automaticamente aqui.";
+      }
+
+      return new Response(
+        JSON.stringify({ error: errMsg }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
-    console.log("Final events:", events.length);
+    const data = await eventsRes.json();
+    const rawEvents = data.data || data.events || [];
+    const events = rawEvents.map((e: any) => ({
+      id: String(e.id || crypto.randomUUID()),
+      title: e.title || e.summary || e.name || "",
+      description: e.description || e.notes || null,
+      start: e.date_start || e.start_date || e.start || null,
+      end: e.date_end || e.end_date || e.end || null,
+      location: e.location || null,
+      url: e.url || e.link || null,
+      timezone: e.timezone || null,
+    })).filter((e: any) => e.title);
 
     return new Response(JSON.stringify(events), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -104,16 +93,40 @@ serve(async (req) => {
   }
 });
 
-function mapEvents(rawEvents: any[]): any[] {
-  return rawEvents.map((e: any) => ({
-    id: String(e.id || e.uid || crypto.randomUUID()),
-    title: e.title || e.summary || e.name || "",
-    description: e.description || e.notes || null,
-    start: e.date_start || e.start_date || e.start || e.date_start_date || null,
-    end: e.date_end || e.end_date || e.end || e.date_end_date || null,
-    location: e.location || null,
-    url: e.url || e.link || null,
-    timezone: e.timezone || null,
-    allday: e.all_day_event === "true" || e.allday === true || e.all_day === true,
-  })).filter((e: any) => e.title);
+function parseICalToJSON(icalText: string) {
+  const events: any[] = [];
+  const eventBlocks = icalText.split("BEGIN:VEVENT");
+
+  for (let i = 1; i < eventBlocks.length; i++) {
+    const block = eventBlocks[i].split("END:VEVENT")[0];
+    const unfolded = block.replace(/\r?\n[ \t]/g, "");
+
+    const getField = (name: string): string | null => {
+      const regex = new RegExp(`^${name}(?:;[^:]*)?:(.+)$`, "m");
+      const match = unfolded.match(regex);
+      return match ? match[1].replace(/\\n/g, "\n").replace(/\\,/g, ",").trim() : null;
+    };
+
+    const parseDate = (s: string | null): string | null => {
+      if (!s) return null;
+      const c = s.replace(/[^0-9TZ]/g, "");
+      if (c.length < 8) return null;
+      return `${c.slice(0,4)}-${c.slice(4,6)}-${c.slice(6,8)}T${c.slice(9,11)||"00"}:${c.slice(11,13)||"00"}:00`;
+    };
+
+    const title = getField("SUMMARY");
+    const start = parseDate(getField("DTSTART"));
+    if (title && start) {
+      events.push({
+        id: getField("UID") || `event-${i}`,
+        title,
+        description: getField("DESCRIPTION"),
+        start,
+        end: parseDate(getField("DTEND")),
+        location: getField("LOCATION"),
+        url: getField("URL"),
+      });
+    }
+  }
+  return events;
 }
