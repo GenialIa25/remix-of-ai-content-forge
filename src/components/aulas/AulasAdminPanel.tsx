@@ -60,6 +60,7 @@ export default function AulasAdminPanel({ modules, getLessonsByModule, onDataCha
         title: moduleForm.title,
         description: moduleForm.description || null,
         order_index: maxOrder,
+        is_active: true,
       });
       if (error) { console.error("Erro ao criar módulo:", error); toast.error("Erro ao criar módulo: " + error.message); return; }
       toast.success("Módulo criado");
@@ -107,6 +108,7 @@ export default function AulasAdminPanel({ modules, getLessonsByModule, onDataCha
         loom_id: lessonForm.loom_id,
         duration: lessonForm.duration || null,
         order_index: maxOrder,
+        is_active: true,
       });
       if (error) { console.error("Erro ao criar aula:", error); toast.error("Erro ao criar aula: " + error.message); return; }
       toast.success("Aula criada");
