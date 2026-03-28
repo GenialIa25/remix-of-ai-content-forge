@@ -93,5 +93,5 @@ export function useLessons() {
     [user, completedLessons]
   );
 
-  return { modules, lessons, completedLessons, loading, getLessonsByModule, toggleCompleted };
+  return { modules, lessons, completedLessons, loading, getLessonsByModule, toggleCompleted, refetch: fetchData };
 }
