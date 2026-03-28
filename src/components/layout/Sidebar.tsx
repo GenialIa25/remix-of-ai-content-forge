@@ -74,6 +74,7 @@ export default function Sidebar() {
         <NavItem icon={<BookOpen className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="Documentos" onClick={() => setDocsOpen(true)} />
         <NavItem icon={<ClipboardCheck className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="Implementação" active={activePage === 'implementation'} onClick={() => { setActivePage('implementation'); if (isMobile) setSidebarOpen(false); }} />
         <NavItem icon={<BarChart3 className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="Métricas" active={activePage === 'metrics'} onClick={() => { setActivePage('metrics'); if (isMobile) setSidebarOpen(false); }} />
+        <NavItem icon={<Newspaper className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="News Feed" active={activePage === 'news-feed'} onClick={() => { setActivePage('news-feed'); if (isMobile) setSidebarOpen(false); }} />
       </div>
 
       {/* Agents Section - label "GPTs" not "AGENTES" */}
