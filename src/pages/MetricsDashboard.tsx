@@ -6,6 +6,7 @@ import { MetricsSection } from '@/components/metrics/MetricsSection';
 import { RevenueChart } from '@/components/metrics/RevenueChart';
 import { RoasChart } from '@/components/metrics/RoasChart';
 import { ClientsFunnel } from '@/components/metrics/ClientsFunnel';
+import { ClientCompositionBar } from '@/components/metrics/ClientCompositionBar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel, SelectSeparator } from '@/components/ui/select';
 import { Loader2 } from 'lucide-react';
 
