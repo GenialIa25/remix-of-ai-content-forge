@@ -1,6 +1,27 @@
 import { create } from 'zustand';
 import { Message, Conversation, AGENTS } from '@/types';
 
+export type ActivePage =
+  | 'home'
+  | 'chat'
+  | 'market-research'
+  | 'creator-kit'
+  | 'implementation'
+  | 'aulas'
+  | 'metrics'
+  | 'calendario'
+  | 'news-feed'
+  | 'visao-geral'
+  | 'instagram-perfil'
+  | 'instagram-radar'
+  | 'instagram-estudio'
+  | 'youtube-canal'
+  | 'youtube-radar'
+  | 'youtube-estudio'
+  | 'gemz-diretora'
+  | 'gemz-copy'
+  | 'gemz-sombra';
+
 interface ChatState {
   conversations: Conversation[];
   activeConversationId: string | null;
@@ -8,13 +29,13 @@ interface ChatState {
   sidebarOpen: boolean;
   selectedModel: string;
   thinkingMode: boolean;
-  activePage: 'home' | 'chat' | 'market-research' | 'creator-kit' | 'implementation' | 'aulas' | 'metrics' | 'calendario' | 'news-feed';
+  activePage: ActivePage;
 
   setActiveAgent: (agentId: string) => void;
   setSidebarOpen: (open: boolean) => void;
   setSelectedModel: (model: string) => void;
   setThinkingMode: (on: boolean) => void;
-  setActivePage: (page: 'home' | 'chat' | 'market-research' | 'creator-kit' | 'implementation' | 'aulas' | 'metrics' | 'calendario' | 'news-feed') => void;
+  setActivePage: (page: ActivePage) => void;
   createConversation: (agentId: string) => string;
   setActiveConversation: (id: string | null) => void;
   addMessage: (conversationId: string, message: Message) => void;

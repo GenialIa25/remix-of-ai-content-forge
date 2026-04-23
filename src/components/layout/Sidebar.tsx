@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import gemzLogo from '@/assets/gemz-logo.png';
+import gemzIconLight from '@/assets/gemz-ai-icon-light.png';
+import gemzIconDark from '@/assets/gemz-ai-icon-dark.png';
 import { AGENTS, AGENT_AVATARS } from '@/types';
-import { useChatStore } from '@/stores/chatStore';
-import { PanelLeft, Pencil, Search, AppWindow, BookOpen, MessageSquare, X, FlaskConical, Sun, Moon, Home, Boxes, ClipboardCheck, GraduationCap, BarChart3, CalendarDays, Newspaper } from 'lucide-react';
+import { useChatStore, ActivePage } from '@/stores/chatStore';
+import { PanelLeft, Pencil, Search, AppWindow, BookOpen, MessageSquare, X, FlaskConical, Sun, Moon, Home, Boxes, ClipboardCheck, GraduationCap, BarChart3, CalendarDays, Newspaper, LayoutGrid, Instagram, Youtube, ChevronRight } from 'lucide-react';
 import { useTheme } from '@/hooks/useTheme';
 import SearchModal from '@/components/modals/SearchModal';
 import ImagesModal from '@/components/modals/ImagesModal';
@@ -75,6 +77,47 @@ export default function Sidebar() {
         <NavItem icon={<ClipboardCheck className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="Implementação" active={activePage === 'implementation'} onClick={() => { setActivePage('implementation'); if (isMobile) setSidebarOpen(false); }} />
         <NavItem icon={<BarChart3 className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="Métricas" active={activePage === 'metrics'} onClick={() => { setActivePage('metrics'); if (isMobile) setSidebarOpen(false); }} />
         <NavItem icon={<Newspaper className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="News Feed" active={activePage === 'news-feed'} onClick={() => { setActivePage('news-feed'); if (isMobile) setSidebarOpen(false); }} />
+
+        {/* New sections — added without removing anything above */}
+        <NavItem
+          icon={<LayoutGrid className="w-[18px] h-[18px]" strokeWidth={1.5} />}
+          label="Visão Geral"
+          active={activePage === 'visao-geral'}
+          onClick={() => { setActivePage('visao-geral'); if (isMobile) setSidebarOpen(false); }}
+        />
+        <ExpandableNavItem
+          icon={<Instagram className="w-[18px] h-[18px]" strokeWidth={1.5} />}
+          label="Instagram"
+          activePage={activePage}
+          subItems={[
+            { label: 'Meu Perfil', page: 'instagram-perfil' },
+            { label: 'Radar', page: 'instagram-radar' },
+            { label: 'Estúdio', page: 'instagram-estudio' },
+          ]}
+          onSelect={(p) => { setActivePage(p); if (isMobile) setSidebarOpen(false); }}
+        />
+        <ExpandableNavItem
+          icon={<Youtube className="w-[18px] h-[18px]" strokeWidth={1.5} />}
+          label="YouTube"
+          activePage={activePage}
+          subItems={[
+            { label: 'Meu Canal', page: 'youtube-canal' },
+            { label: 'Radar', page: 'youtube-radar' },
+            { label: 'Estúdio', page: 'youtube-estudio' },
+          ]}
+          onSelect={(p) => { setActivePage(p); if (isMobile) setSidebarOpen(false); }}
+        />
+        <ExpandableNavItem
+          icon={<GemzIcon />}
+          label="GEMZ AI"
+          activePage={activePage}
+          subItems={[
+            { label: 'GABBY Diretora Criativa', page: 'gemz-diretora' },
+            { label: 'GABBY Copywriter', page: 'gemz-copy' },
+            { label: 'GABBY Sombra', page: 'gemz-sombra' },
+          ]}
+          onSelect={(p) => { setActivePage(p); if (isMobile) setSidebarOpen(false); }}
+        />
       </div>
 
       {/* Agents Section - label "GPTs" not "AGENTES" */}
@@ -187,5 +230,64 @@ function ThemeToggle() {
         <Moon className="w-4 h-4 text-muted-foreground" />
       )}
     </button>
+  );
+}
+
+function GemzIcon() {
+  const { theme } = useTheme();
+  const src = theme === 'dark' ? gemzIconDark : gemzIconLight;
+  return <img src={src} alt="GEMZ AI" className="w-[18px] h-[18px] object-contain" />;
+}
+
+function ExpandableNavItem({
+  icon,
+  label,
+  subItems,
+  activePage,
+  onSelect,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  subItems: { label: string; page: ActivePage }[];
+  activePage: ActivePage;
+  onSelect: (page: ActivePage) => void;
+}) {
+  const containsActive = subItems.some((s) => s.page === activePage);
+  const [open, setOpen] = useState(containsActive);
+  const expanded = open || containsActive;
+
+  return (
+    <div>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+          containsActive ? 'bg-secondary' : 'hover:bg-secondary'
+        }`}
+        aria-label={label}
+      >
+        <span className="text-muted-foreground">{icon}</span>
+        <span className="text-sm text-foreground flex-1 text-left">{label}</span>
+        <ChevronRight
+          className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${expanded ? 'rotate-90' : ''}`}
+        />
+      </button>
+      {expanded && (
+        <div className="ml-7 mt-0.5 space-y-0.5 border-l border-border pl-2">
+          {subItems.map((s) => (
+            <button
+              key={s.page}
+              onClick={() => onSelect(s.page)}
+              className={`w-full text-left px-3 py-1.5 rounded-lg text-xs transition-colors ${
+                activePage === s.page
+                  ? 'bg-secondary text-foreground font-medium'
+                  : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
+              }`}
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
