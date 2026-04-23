@@ -77,6 +77,47 @@ export default function Sidebar() {
         <NavItem icon={<ClipboardCheck className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="Implementação" active={activePage === 'implementation'} onClick={() => { setActivePage('implementation'); if (isMobile) setSidebarOpen(false); }} />
         <NavItem icon={<BarChart3 className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="Métricas" active={activePage === 'metrics'} onClick={() => { setActivePage('metrics'); if (isMobile) setSidebarOpen(false); }} />
         <NavItem icon={<Newspaper className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="News Feed" active={activePage === 'news-feed'} onClick={() => { setActivePage('news-feed'); if (isMobile) setSidebarOpen(false); }} />
+
+        {/* New sections — added without removing anything above */}
+        <NavItem
+          icon={<LayoutGrid className="w-[18px] h-[18px]" strokeWidth={1.5} />}
+          label="Visão Geral"
+          active={activePage === 'visao-geral'}
+          onClick={() => { setActivePage('visao-geral'); if (isMobile) setSidebarOpen(false); }}
+        />
+        <ExpandableNavItem
+          icon={<Instagram className="w-[18px] h-[18px]" strokeWidth={1.5} />}
+          label="Instagram"
+          activePage={activePage}
+          subItems={[
+            { label: 'Meu Perfil', page: 'instagram-perfil' },
+            { label: 'Radar', page: 'instagram-radar' },
+            { label: 'Estúdio', page: 'instagram-estudio' },
+          ]}
+          onSelect={(p) => { setActivePage(p); if (isMobile) setSidebarOpen(false); }}
+        />
+        <ExpandableNavItem
+          icon={<Youtube className="w-[18px] h-[18px]" strokeWidth={1.5} />}
+          label="YouTube"
+          activePage={activePage}
+          subItems={[
+            { label: 'Meu Canal', page: 'youtube-canal' },
+            { label: 'Radar', page: 'youtube-radar' },
+            { label: 'Estúdio', page: 'youtube-estudio' },
+          ]}
+          onSelect={(p) => { setActivePage(p); if (isMobile) setSidebarOpen(false); }}
+        />
+        <ExpandableNavItem
+          icon={<GemzIcon />}
+          label="GEMZ AI"
+          activePage={activePage}
+          subItems={[
+            { label: 'GABBY Diretora Criativa', page: 'gemz-diretora' },
+            { label: 'GABBY Copywriter', page: 'gemz-copy' },
+            { label: 'GABBY Sombra', page: 'gemz-sombra' },
+          ]}
+          onSelect={(p) => { setActivePage(p); if (isMobile) setSidebarOpen(false); }}
+        />
       </div>
 
       {/* Agents Section - label "GPTs" not "AGENTES" */}
