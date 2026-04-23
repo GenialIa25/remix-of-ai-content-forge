@@ -232,3 +232,62 @@ function ThemeToggle() {
     </button>
   );
 }
+
+function GemzIcon() {
+  const { theme } = useTheme();
+  const src = theme === 'dark' ? gemzIconDark : gemzIconLight;
+  return <img src={src} alt="GEMZ AI" className="w-[18px] h-[18px] object-contain" />;
+}
+
+function ExpandableNavItem({
+  icon,
+  label,
+  subItems,
+  activePage,
+  onSelect,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  subItems: { label: string; page: ActivePage }[];
+  activePage: ActivePage;
+  onSelect: (page: ActivePage) => void;
+}) {
+  const containsActive = subItems.some((s) => s.page === activePage);
+  const [open, setOpen] = useState(containsActive);
+  const expanded = open || containsActive;
+
+  return (
+    <div>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+          containsActive ? 'bg-secondary' : 'hover:bg-secondary'
+        }`}
+        aria-label={label}
+      >
+        <span className="text-muted-foreground">{icon}</span>
+        <span className="text-sm text-foreground flex-1 text-left">{label}</span>
+        <ChevronRight
+          className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${expanded ? 'rotate-90' : ''}`}
+        />
+      </button>
+      {expanded && (
+        <div className="ml-7 mt-0.5 space-y-0.5 border-l border-border pl-2">
+          {subItems.map((s) => (
+            <button
+              key={s.page}
+              onClick={() => onSelect(s.page)}
+              className={`w-full text-left px-3 py-1.5 rounded-lg text-xs transition-colors ${
+                activePage === s.page
+                  ? 'bg-secondary text-foreground font-medium'
+                  : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
+              }`}
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
