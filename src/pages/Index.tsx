@@ -12,6 +12,12 @@ import VisaoGeralPage from '@/pages/VisaoGeralPage';
 import InstagramPerfilPage from '@/pages/instagram/InstagramPerfilPage';
 import InstagramRadarPage from '@/pages/instagram/InstagramRadarPage';
 import InstagramEstudioPage from '@/pages/instagram/InstagramEstudioPage';
+import YoutubeCanalPage from '@/pages/youtube/YoutubeCanalPage';
+import YoutubeRadarPage from '@/pages/youtube/YoutubeRadarPage';
+import YoutubeEstudioPage from '@/pages/youtube/YoutubeEstudioPage';
+import GabbyDiretoraPage from '@/pages/gemz/GabbyDiretoraPage';
+import GabbyCopyPage from '@/pages/gemz/GabbyCopyPage';
+import GabbySombraPage from '@/pages/gemz/GabbySombraPage';
 import PlaceholderPage from '@/pages/PlaceholderPage';
 import { useChatStore } from '@/stores/chatStore';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -48,17 +54,17 @@ export default function Index() {
       case 'instagram-estudio':
         return <InstagramEstudioPage />;
       case 'youtube-canal':
-        return <PlaceholderPage title="Meu Canal" subtitle="Dados via Social Blade API e YouTube Data API v3" />;
+        return <YoutubeCanalPage />;
       case 'youtube-radar':
-        return <PlaceholderPage title="Radar do YouTube" subtitle="Acompanhe canais de referência" />;
+        return <YoutubeRadarPage />;
       case 'youtube-estudio':
-        return <PlaceholderPage title="Estúdio do YouTube" subtitle="Pipeline de produção de vídeos" />;
+        return <YoutubeEstudioPage />;
       case 'gemz-diretora':
-        return <PlaceholderPage title="GABBY Diretora Criativa" subtitle="Refine ângulos com a IA" />;
+        return <GabbyDiretoraPage />;
       case 'gemz-copy':
-        return <PlaceholderPage title="GABBY Copywriter" subtitle="Escreva roteiros com a IA" />;
+        return <GabbyCopyPage />;
       case 'gemz-sombra':
-        return <PlaceholderPage title="GABBY Sombra" subtitle="Seu agente de revisão silencioso" />;
+        return <GabbySombraPage />;
       default:
         return <ChatArea />;
     }
