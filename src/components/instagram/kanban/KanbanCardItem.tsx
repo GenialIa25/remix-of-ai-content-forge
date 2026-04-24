@@ -1,5 +1,4 @@
 import { GripVertical, Trash2, Sparkles, FileText } from 'lucide-react';
-import { GripVertical, Trash2, Sparkles, FileText } from 'lucide-react';
 import { KanbanCard, TAG_META } from './types';
 
 interface Props {
