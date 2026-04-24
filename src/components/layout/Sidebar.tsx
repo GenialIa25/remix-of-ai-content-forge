@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import gemzLogo from '@/assets/gemz-logo.png';
-import gemzIconLight from '@/assets/gemz-ai-icon-light.png';
-import gemzIconDark from '@/assets/gemz-ai-icon-dark.png';
+import gemzIcon from '@/assets/gemz-ai-icon.png';
 import { AGENTS, AGENT_AVATARS } from '@/types';
 import { useChatStore, ActivePage } from '@/stores/chatStore';
 import { PanelLeft, Pencil, Search, AppWindow, BookOpen, MessageSquare, X, FlaskConical, Sun, Moon, Home, Boxes, ClipboardCheck, GraduationCap, BarChart3, CalendarDays, Newspaper, LayoutGrid, Instagram, Youtube, ChevronRight } from 'lucide-react';
@@ -235,8 +234,14 @@ function ThemeToggle() {
 
 function GemzIcon() {
   const { theme } = useTheme();
-  const src = theme === 'dark' ? gemzIconDark : gemzIconLight;
-  return <img src={src} alt="GEMZ AI" className="w-[18px] h-[18px] object-contain" />;
+  return (
+    <img
+      src={gemzIcon}
+      alt="GEMZ AI"
+      className="w-[18px] h-[18px] object-contain"
+      style={{ filter: theme === 'dark' ? 'invert(1) brightness(1.1)' : 'none' }}
+    />
+  );
 }
 
 function ExpandableNavItem({
