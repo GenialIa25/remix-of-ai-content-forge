@@ -1,6 +1,6 @@
 import { GripVertical, Trash2, Sparkles, FileText } from 'lucide-react';
+import { GripVertical, Trash2, Sparkles, FileText } from 'lucide-react';
 import { KanbanCard, TAG_META } from './types';
-// hideTags is supported via prop on KanbanCardItem usage
 
 interface Props {
   card: KanbanCard;
