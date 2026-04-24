@@ -29,6 +29,7 @@ export default function InstagramRadarPage() {
   const [account, setAccount] = useState('all');
   const [canReanalyze, setCanReanalyze] = useState(true);
   const [daysToNext, setDaysToNext] = useState(0);
+  const [canSync, setCanSync] = useState(true);
 
   useEffect(() => {
     const last = localStorage.getItem('ig-radar-last-analysis');
@@ -40,12 +41,20 @@ export default function InstagramRadarPage() {
         setDaysToNext(30 - days);
       }
     }
+    const today = new Date().toISOString().slice(0, 10);
+    if (localStorage.getItem('last_sync_instagram') === today) setCanSync(false);
   }, []);
 
   const handleReanalyze = () => {
     localStorage.setItem('ig-radar-last-analysis', Date.now().toString());
     setCanReanalyze(false);
     setDaysToNext(30);
+  };
+
+  const handleSync = () => {
+    const today = new Date().toISOString().slice(0, 10);
+    localStorage.setItem('last_sync_instagram', today);
+    setCanSync(false);
   };
 
   return (
@@ -70,7 +79,7 @@ export default function InstagramRadarPage() {
                   className={`relative transition-colors ${
                     tab === t ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
                   }`}
-                  style={{ padding: '18px 28px', fontSize: '15px', fontWeight: 700 }}
+                  style={{ padding: '18px 28px', fontSize: '15px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}
                 >
                   {t === 'feed' ? 'Feed' : 'Análise'}
                   {tab === t && (
@@ -81,9 +90,16 @@ export default function InstagramRadarPage() {
             </div>
             {tab === 'feed' && (
               <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground">Sincronizado há 2h</span>
-                <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-secondary hover:bg-accent text-foreground border border-border transition-colors">
-                  <RefreshCw className="w-3 h-3" /> Sincronizar feed
+                <span className="text-xs text-muted-foreground">
+                  {canSync ? 'Sincronizado há 2h' : 'Sincronizado hoje · disponível amanhã'}
+                </span>
+                <button
+                  onClick={handleSync}
+                  disabled={!canSync}
+                  title={!canSync ? 'Limite diário atingido. Disponível novamente amanhã.' : undefined}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-secondary hover:bg-accent text-foreground border border-border transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-secondary"
+                >
+                  <RefreshCw className="w-3 h-3" /> Sincronizar
                 </button>
               </div>
             )}
