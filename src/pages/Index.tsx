@@ -18,7 +18,7 @@ import YoutubeEstudioPage from '@/pages/youtube/YoutubeEstudioPage';
 import GabbyDiretoraPage from '@/pages/gemz/GabbyDiretoraPage';
 import GabbyCopyPage from '@/pages/gemz/GabbyCopyPage';
 import GabbySombraPage from '@/pages/gemz/GabbySombraPage';
-import PlaceholderPage from '@/pages/PlaceholderPage';
+
 import { useChatStore } from '@/stores/chatStore';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Menu } from 'lucide-react';
