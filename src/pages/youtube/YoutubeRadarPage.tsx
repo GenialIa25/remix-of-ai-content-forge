@@ -56,7 +56,7 @@ export default function YoutubeRadarPage() {
         </h1>
       </div>
 
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur border-b border-border">
+      <div className="sticky top-0 z-[15] bg-background/95 backdrop-blur border-b border-border shadow-[0_2px_12px_rgba(0,0,0,0.06)] dark:shadow-[0_2px_16px_rgba(0,0,0,0.35)]">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center justify-between">
             <div className="flex">
@@ -64,12 +64,13 @@ export default function YoutubeRadarPage() {
                 <button
                   key={t}
                   onClick={() => setTab(t)}
-                  className={`relative px-4 py-3 text-sm font-medium transition-colors ${
+                  className={`relative transition-colors ${
                     tab === t ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
                   }`}
+                  style={{ padding: '18px 28px', fontSize: '15px', fontWeight: 700 }}
                 >
                   {t === 'feed' ? 'Feed' : 'Análise'}
-                  {tab === t && <span className="absolute bottom-0 left-2 right-2 h-0.5 rounded-full" style={{ backgroundColor: '#5a6b2a' }} />}
+                  {tab === t && <span className="absolute bottom-0 left-0 right-0" style={{ height: '3px', backgroundColor: '#5a6b2a' }} />}
                 </button>
               ))}
             </div>
