@@ -257,10 +257,9 @@ function GemzBrandLogo() {
   const { theme } = useTheme();
   return (
     <img
-      src={gemzLogo}
+      src={theme === 'dark' ? gemzWordmarkDark : gemzWordmarkLight}
       alt="GEMZ"
       className="h-5 w-auto object-contain"
-      style={{ filter: theme === 'dark' ? 'invert(1) brightness(1.1)' : 'none' }}
     />
   );
 }
