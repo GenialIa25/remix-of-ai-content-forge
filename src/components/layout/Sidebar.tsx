@@ -121,6 +121,7 @@ export default function Sidebar() {
           active={activePage === 'news-feed'}
           onClick={() => { setActivePage('news-feed'); if (isMobile) setSidebarOpen(false); }}
         />
+      </div>
 
       {/* Conversas - histórico */}
       <div className="mt-4 px-2">
