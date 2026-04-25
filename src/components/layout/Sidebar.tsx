@@ -69,23 +69,11 @@ export default function Sidebar() {
       <div className="px-2 space-y-0.5">
         <NavItem icon={<Home className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="Início" active={activePage === 'home'} onClick={() => { setActivePage('home'); if (isMobile) setSidebarOpen(false); }} />
         <NavItem icon={<Boxes className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="CreatorFounder™️ Kit" active={activePage === 'creator-kit'} onClick={() => { setActivePage('creator-kit'); if (isMobile) setSidebarOpen(false); }} />
-        {/* Pesquisa de Mercado moved into Agentes */}
-        <NavItem icon={<Search className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="Buscar" onClick={() => setSearchOpen(true)} />
-        <NavItem icon={<AppWindow className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="Aplicativos" onClick={() => setAppsOpen(true)} />
         <NavItem icon={<GraduationCap className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="Aulas" active={activePage === 'aulas'} onClick={() => { setActivePage('aulas'); if (isMobile) setSidebarOpen(false); }} />
         <NavItem icon={<CalendarDays className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="Calendário" active={activePage === 'calendario'} onClick={() => { setActivePage('calendario'); if (isMobile) setSidebarOpen(false); }} />
         <NavItem icon={<BookOpen className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="Documentos" onClick={() => setDocsOpen(true)} />
         <NavItem icon={<ClipboardCheck className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="Implementação" active={activePage === 'implementation'} onClick={() => { setActivePage('implementation'); if (isMobile) setSidebarOpen(false); }} />
         <NavItem icon={<BarChart3 className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="Métricas" active={activePage === 'metrics'} onClick={() => { setActivePage('metrics'); if (isMobile) setSidebarOpen(false); }} />
-        <NavItem icon={<Newspaper className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="News Feed" active={activePage === 'news-feed'} onClick={() => { setActivePage('news-feed'); if (isMobile) setSidebarOpen(false); }} />
-
-        {/* New sections — added without removing anything above */}
-        <NavItem
-          icon={<LayoutGrid className="w-[18px] h-[18px]" strokeWidth={1.5} />}
-          label="Visão Geral"
-          active={activePage === 'visao-geral'}
-          onClick={() => { setActivePage('visao-geral'); if (isMobile) setSidebarOpen(false); }}
-        />
 
         {/* Section separator + GEMZ brand label */}
         <div className="mx-4 my-2 h-px bg-border" />
@@ -127,7 +115,12 @@ export default function Sidebar() {
           ]}
           onSelect={(p) => { setActivePage(p); if (isMobile) setSidebarOpen(false); }}
         />
-      </div>
+        <NavItem
+          icon={<Newspaper className="w-[18px] h-[18px]" strokeWidth={1.5} />}
+          label="News Feed"
+          active={activePage === 'news-feed'}
+          onClick={() => { setActivePage('news-feed'); if (isMobile) setSidebarOpen(false); }}
+        />
 
       {/* Conversas - histórico */}
       <div className="mt-4 px-2">
