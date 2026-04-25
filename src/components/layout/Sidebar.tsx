@@ -123,6 +123,7 @@ export default function Sidebar() {
             { label: 'GABBY Diretora Criativa', page: 'gemz-diretora' },
             { label: 'GABBY Copywriter', page: 'gemz-copy' },
             { label: 'GABBY Sombra', page: 'gemz-sombra' },
+            { label: 'Pesquisa de Mercado', page: 'market-research' },
           ]}
           onSelect={(p) => { setActivePage(p); if (isMobile) setSidebarOpen(false); }}
         />
