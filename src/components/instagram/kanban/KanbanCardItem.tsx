@@ -18,7 +18,7 @@ export function KanbanCardItem({ card, onClick, onDelete, onAction, onDragStart,
       draggable
       onDragStart={onDragStart}
       onClick={onClick}
-      className="group relative rounded-[10px] bg-card border border-border p-3 cursor-pointer hover:border-foreground/30 transition-colors"
+      className="group relative rounded-[10px] bg-white dark:bg-card border border-border p-3 cursor-pointer hover:border-foreground/30 transition-colors"
     >
       {/* drag handle */}
       <button className="absolute top-2 left-2 p-0.5 opacity-0 group-hover:opacity-60 transition-opacity cursor-grab active:cursor-grabbing">
