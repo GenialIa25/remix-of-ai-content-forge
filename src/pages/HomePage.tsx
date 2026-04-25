@@ -375,6 +375,11 @@ export default function HomePage() {
               A IA pode cometer erros. Confira informações importantes.
             </p>
           </div>
+
+          {/* Próximas Masterclasses */}
+          <div className="w-full max-w-[680px] mt-10">
+            <UpcomingMasterclasses />
+          </div>
         </div>
       ) : (
         /* Messages view */
