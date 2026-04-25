@@ -4,6 +4,8 @@ import { sendChatMessage } from '@/services/chatService';
 import { AI_MODELS, Message } from '@/types';
 import { Plus, ArrowUp, Square, Paperclip, ImagePlus, Search, Globe, Mic, AudioLines, ChevronDown, ChevronRight, Check, PanelLeft, Menu } from 'lucide-react';
 import gemzLogo from '@/assets/gemz-logo.png';
+import amandaProfile from '@/assets/amanda-profile.png';
+import UpcomingMasterclasses from '@/components/UpcomingMasterclasses';
 import { AttachedFiles, UploadedFile } from '@/components/chat/FileUploadButton';
 import MessageBubble from '@/components/chat/MessageBubble';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -272,8 +274,21 @@ export default function HomePage() {
 
       {!hasMessages ? (
         /* Empty state — centered greeting + input */
-        <div className="flex-1 flex flex-col items-center justify-center px-4">
-          <h1 className="text-[32px] text-foreground mb-6">
+        <div className="flex-1 overflow-y-auto flex flex-col items-center justify-center px-4 py-8">
+          {/* Amanda intro */}
+          <div className="flex flex-col items-center text-center mb-3">
+            <img
+              src={amandaProfile}
+              alt="Amanda AI"
+              className="w-24 h-24 rounded-full object-cover"
+            />
+            <h2 className="mt-4 text-[24px] font-bold text-foreground leading-tight">Amanda AI</h2>
+            <p className="mt-2 text-sm text-muted-foreground max-w-[480px] leading-relaxed">
+              Clone IA da sua mentora, expert no Modelo Creator Founder™ e no Volante de Aquisição™. Tenho acesso aos dados do seu negócio e contexto, serei sua conselheira 24h por dia, 7 dias por semana.
+            </p>
+          </div>
+
+          <h1 className="text-[32px] text-foreground mb-6 mt-6">
             <span className="greeting-prompt">Como posso ajudar,</span>
             <span className="greeting-name"> {firstName}</span>
             <span className="greeting-question">?</span>
@@ -359,6 +374,11 @@ export default function HomePage() {
             <p className="text-center text-xs text-muted-foreground mt-3">
               A IA pode cometer erros. Confira informações importantes.
             </p>
+          </div>
+
+          {/* Próximas Masterclasses */}
+          <div className="w-full max-w-[680px] mt-10">
+            <UpcomingMasterclasses />
           </div>
         </div>
       ) : (
