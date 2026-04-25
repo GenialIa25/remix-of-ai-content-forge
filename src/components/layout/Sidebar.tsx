@@ -114,8 +114,8 @@ export default function Sidebar() {
           onSelect={(p) => { setActivePage(p); if (isMobile) setSidebarOpen(false); }}
         />
         <ExpandableNavItem
-          icon={<GemzIcon />}
-          label="GEMZ AI"
+          icon={<Bot className="w-[18px] h-[18px]" strokeWidth={1.5} />}
+          label="Agentes"
           activePage={activePage}
           subItems={[
             { label: 'GABBY Diretora Criativa', page: 'gemz-diretora' },
