@@ -260,7 +260,8 @@ function GemzBrandLogo() {
     <img
       src={theme === 'dark' ? gemzWordmarkDark : gemzWordmarkLight}
       alt="GEMZ"
-      className="h-5 w-auto object-contain"
+      className="w-auto object-contain"
+      style={{ height: '26px' }}
     />
   );
 }
