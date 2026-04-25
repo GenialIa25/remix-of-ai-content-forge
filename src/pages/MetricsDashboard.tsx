@@ -10,6 +10,7 @@ import { ClientCompositionBar } from '@/components/metrics/ClientCompositionBar'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel, SelectSeparator } from '@/components/ui/select';
 import { Loader2 } from 'lucide-react';
 import loulouLogo from '@/assets/loulou-studios-logo.png';
+import VisaoGeralSection from '@/components/VisaoGeralSection';
 
 function buildPeriodOptions() {
   const now = new Date();
@@ -120,6 +121,9 @@ export default function MetricsDashboard() {
             </Select>
           </div>
         </div>
+
+        {/* Visão Geral (movido da sidebar) */}
+        <VisaoGeralSection />
 
         {/* Description box */}
         <div className="rounded-xl border border-border bg-card p-6">
