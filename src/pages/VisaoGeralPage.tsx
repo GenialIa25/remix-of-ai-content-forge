@@ -1,4 +1,5 @@
-import { TrendingUp, TrendingDown, Calendar, MapPin, Users } from 'lucide-react';
+import { TrendingUp, TrendingDown } from 'lucide-react';
+import UpcomingMasterclasses from '@/components/UpcomingMasterclasses';
 
 const metrics = [
   { label: 'Receita', value: 'R$ 482.300', change: 12.4, positive: true },
@@ -9,36 +10,6 @@ const metrics = [
   { label: 'Inscritos YouTube', value: '52.7K', change: 5.8, positive: true },
   { label: 'Lista de Email', value: '24.130', change: 1.2, positive: true },
   { label: 'Despesas', value: 'R$ 142.700', change: -2.4, positive: false },
-];
-
-const masterclasses = [
-  {
-    day: '08',
-    month: 'Mai',
-    name: 'Sistema de Conteúdo Infinito',
-    time: '20:00 — 22:00',
-    place: 'Online · Zoom',
-    enrolled: 412,
-    status: 'Em breve' as const,
-  },
-  {
-    day: '15',
-    month: 'Mai',
-    name: 'Funil de Vendas para Creators',
-    time: '19:30 — 21:30',
-    place: 'Online · Zoom',
-    enrolled: 287,
-    status: 'Aberto' as const,
-  },
-  {
-    day: '22',
-    month: 'Mai',
-    name: 'IA Aplicada ao Marketing',
-    time: '20:00 — 22:00',
-    place: 'Online · Zoom',
-    enrolled: 156,
-    status: 'Aberto' as const,
-  },
 ];
 
 export default function VisaoGeralPage() {
