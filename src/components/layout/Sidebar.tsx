@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import gemzLogo from '@/assets/gemz-logo.png';
 import gemzIcon from '@/assets/gemz-ai-icon.png';
+import gemzWordmarkDark from '@/assets/gemz-wordmark-dark.png';
+import gemzWordmarkLight from '@/assets/gemz-wordmark-light.png';
 import { AGENTS, AGENT_AVATARS } from '@/types';
 import { useChatStore, ActivePage } from '@/stores/chatStore';
 import { PanelLeft, Pencil, Search, AppWindow, BookOpen, MessageSquare, X, FlaskConical, Sun, Moon, Home, Boxes, ClipboardCheck, GraduationCap, BarChart3, CalendarDays, Newspaper, LayoutGrid, Instagram, Youtube, ChevronRight, Bot } from 'lucide-react';
