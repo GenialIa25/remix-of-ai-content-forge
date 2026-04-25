@@ -280,9 +280,8 @@ export default function HomePage() {
             <img
               src={amandaProfile}
               alt="Amanda AI"
-              className="w-24 h-24 rounded-full object-cover"
+              className="w-32 h-32 object-contain"
             />
-            <h2 className="mt-4 text-[24px] font-bold text-foreground leading-tight">Amanda AI</h2>
             <p className="mt-2 text-sm text-muted-foreground max-w-[480px] leading-relaxed">
               Clone IA da sua mentora, expert no Modelo Creator Founder™ e no Volante de Aquisição™. Tenho acesso aos dados do seu negócio e contexto, serei sua conselheira 24h por dia, 7 dias por semana.
             </p>
