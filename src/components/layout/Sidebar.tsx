@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import gemzLogo from '@/assets/gemz-logo.png';
 import gemzIcon from '@/assets/gemz-ai-icon.png';
+import gemzWordmarkDark from '@/assets/gemz-wordmark-dark.png';
+import gemzWordmarkLight from '@/assets/gemz-wordmark-light.png';
 import { AGENTS, AGENT_AVATARS } from '@/types';
 import { useChatStore, ActivePage } from '@/stores/chatStore';
 import { PanelLeft, Pencil, Search, AppWindow, BookOpen, MessageSquare, X, FlaskConical, Sun, Moon, Home, Boxes, ClipboardCheck, GraduationCap, BarChart3, CalendarDays, Newspaper, LayoutGrid, Instagram, Youtube, ChevronRight, Bot } from 'lucide-react';
@@ -255,10 +257,9 @@ function GemzBrandLogo() {
   const { theme } = useTheme();
   return (
     <img
-      src={gemzLogo}
+      src={theme === 'dark' ? gemzWordmarkDark : gemzWordmarkLight}
       alt="GEMZ"
       className="h-5 w-auto object-contain"
-      style={{ filter: theme === 'dark' ? 'invert(1) brightness(1.1)' : 'none' }}
     />
   );
 }
