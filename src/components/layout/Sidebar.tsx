@@ -84,6 +84,13 @@ export default function Sidebar() {
           active={activePage === 'visao-geral'}
           onClick={() => { setActivePage('visao-geral'); if (isMobile) setSidebarOpen(false); }}
         />
+
+        {/* Section separator + GEMZ brand label */}
+        <div className="mx-4 my-2 h-px bg-border" />
+        <div className="px-3 py-1.5 flex items-center">
+          <GemzBrandLogo />
+        </div>
+
         <ExpandableNavItem
           icon={<Instagram className="w-[18px] h-[18px]" strokeWidth={1.5} />}
           label="Instagram"
