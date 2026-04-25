@@ -122,6 +122,9 @@ export default function MetricsDashboard() {
           </div>
         </div>
 
+        {/* Visão Geral (movido da sidebar) */}
+        <VisaoGeralSection />
+
         {/* Description box */}
         <div className="rounded-xl border border-border bg-card p-6">
           <p className="text-sm text-muted-foreground leading-relaxed">
