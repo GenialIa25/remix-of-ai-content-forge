@@ -129,49 +129,29 @@ export default function Sidebar() {
         />
       </div>
 
-      {/* Agents Section - label "GPTs" not "AGENTES" */}
+      {/* Conversas - histórico */}
       <div className="mt-4 px-2">
-        <span className="px-3 text-xs font-medium text-muted-foreground">Agentes</span>
+        <span className="px-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+          Conversas
+        </span>
       </div>
 
       <div className="flex-1 overflow-y-auto px-2 mt-2 space-y-0.5">
-        {AGENTS.map((agent) => (
-          <button
-            key={agent.id}
-            onClick={() => { setActiveAgent(agent.id); if (isMobile) setSidebarOpen(false); }}
-            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
-              activePage === 'chat' && activeAgentId === agent.id ? 'bg-secondary' : 'hover:bg-secondary'
-            }`}
-            aria-label={agent.name}
-          >
-            <img
-              src={AGENT_AVATARS[agent.id]}
-              alt={agent.name}
-              className="w-6 h-6 rounded-full object-cover shrink-0"
-            />
-            <span className="text-sm text-foreground truncate">{agent.name}</span>
-          </button>
-        ))}
-
-        {/* Recent conversations */}
-        {recentConversations.length > 0 && (
-          <div className="mt-4">
-            <span className="px-3 text-xs font-medium text-muted-foreground">Conversas</span>
-            <div className="mt-1 space-y-0.5">
-              {recentConversations.map((conv) => (
-                <button
-                  key={conv.id}
-                  onClick={() => { setActiveConversation(conv.id); if (isMobile) setSidebarOpen(false); }}
-                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-colors ${
-                    activeConversationId === conv.id ? 'bg-secondary' : 'hover:bg-secondary'
-                  }`}
-                >
-                  <MessageSquare className="w-4 h-4 text-muted-foreground shrink-0" />
-                  <span className="text-sm text-foreground truncate">{conv.title}</span>
-                </button>
-              ))}
-            </div>
-          </div>
+        {recentConversations.length === 0 ? (
+          <p className="px-3 py-2 text-xs text-muted-foreground/70">Nenhuma conversa ainda</p>
+        ) : (
+          recentConversations.map((conv) => (
+            <button
+              key={conv.id}
+              onClick={() => { setActiveConversation(conv.id); if (isMobile) setSidebarOpen(false); }}
+              className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-colors ${
+                activeConversationId === conv.id ? 'bg-secondary' : 'hover:bg-secondary'
+              }`}
+            >
+              <MessageSquare className="w-4 h-4 text-muted-foreground shrink-0" />
+              <span className="text-sm text-foreground truncate">{conv.title}</span>
+            </button>
+          ))
         )}
       </div>
 
