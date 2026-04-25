@@ -69,7 +69,7 @@ export default function Sidebar() {
       <div className="px-2 space-y-0.5">
         <NavItem icon={<Home className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="Início" active={activePage === 'home'} onClick={() => { setActivePage('home'); if (isMobile) setSidebarOpen(false); }} />
         <NavItem icon={<Boxes className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="CreatorFounder™️ Kit" active={activePage === 'creator-kit'} onClick={() => { setActivePage('creator-kit'); if (isMobile) setSidebarOpen(false); }} />
-        <NavItem icon={<FlaskConical className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="Pesquisa de Mercado" active={activePage === 'market-research'} onClick={() => { setActivePage('market-research'); if (isMobile) setSidebarOpen(false); }} />
+        {/* Pesquisa de Mercado moved into Agentes */}
         <NavItem icon={<Search className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="Buscar" onClick={() => setSearchOpen(true)} />
         <NavItem icon={<AppWindow className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="Aplicativos" onClick={() => setAppsOpen(true)} />
         <NavItem icon={<GraduationCap className="w-[18px] h-[18px]" strokeWidth={1.5} />} label="Aulas" active={activePage === 'aulas'} onClick={() => { setActivePage('aulas'); if (isMobile) setSidebarOpen(false); }} />
