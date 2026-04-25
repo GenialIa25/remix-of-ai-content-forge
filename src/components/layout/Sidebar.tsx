@@ -3,7 +3,7 @@ import gemzLogo from '@/assets/gemz-logo.png';
 import gemzIcon from '@/assets/gemz-ai-icon.png';
 import { AGENTS, AGENT_AVATARS } from '@/types';
 import { useChatStore, ActivePage } from '@/stores/chatStore';
-import { PanelLeft, Pencil, Search, AppWindow, BookOpen, MessageSquare, X, FlaskConical, Sun, Moon, Home, Boxes, ClipboardCheck, GraduationCap, BarChart3, CalendarDays, Newspaper, LayoutGrid, Instagram, Youtube, ChevronRight } from 'lucide-react';
+import { PanelLeft, Pencil, Search, AppWindow, BookOpen, MessageSquare, X, FlaskConical, Sun, Moon, Home, Boxes, ClipboardCheck, GraduationCap, BarChart3, CalendarDays, Newspaper, LayoutGrid, Instagram, Youtube, ChevronRight, Bot } from 'lucide-react';
 import { useTheme } from '@/hooks/useTheme';
 import SearchModal from '@/components/modals/SearchModal';
 import ImagesModal from '@/components/modals/ImagesModal';
@@ -84,6 +84,13 @@ export default function Sidebar() {
           active={activePage === 'visao-geral'}
           onClick={() => { setActivePage('visao-geral'); if (isMobile) setSidebarOpen(false); }}
         />
+
+        {/* Section separator + GEMZ brand label */}
+        <div className="mx-4 my-2 h-px bg-border" />
+        <div className="px-3 py-1.5 flex items-center">
+          <GemzBrandLogo />
+        </div>
+
         <ExpandableNavItem
           icon={<Instagram className="w-[18px] h-[18px]" strokeWidth={1.5} />}
           label="Instagram"
@@ -107,8 +114,8 @@ export default function Sidebar() {
           onSelect={(p) => { setActivePage(p); if (isMobile) setSidebarOpen(false); }}
         />
         <ExpandableNavItem
-          icon={<GemzIcon />}
-          label="GEMZ AI"
+          icon={<Bot className="w-[18px] h-[18px]" strokeWidth={1.5} />}
+          label="Agentes"
           activePage={activePage}
           subItems={[
             { label: 'GABBY Diretora Criativa', page: 'gemz-diretora' },
@@ -239,6 +246,18 @@ function GemzIcon() {
       src={gemzIcon}
       alt="GEMZ AI"
       className="w-[18px] h-[18px] object-contain"
+      style={{ filter: theme === 'dark' ? 'invert(1) brightness(1.1)' : 'none' }}
+    />
+  );
+}
+
+function GemzBrandLogo() {
+  const { theme } = useTheme();
+  return (
+    <img
+      src={gemzLogo}
+      alt="GEMZ"
+      className="h-5 w-auto object-contain"
       style={{ filter: theme === 'dark' ? 'invert(1) brightness(1.1)' : 'none' }}
     />
   );
