@@ -111,9 +111,14 @@ export default function Sidebar() {
             { label: 'GABBY Diretora Criativa', page: 'gemz-diretora' },
             { label: 'GABBY Copywriter', page: 'gemz-copy' },
             { label: 'GABBY Sombra', page: 'gemz-sombra' },
-            { label: 'Pesquisa de Mercado', page: 'market-research' },
           ]}
           onSelect={(p) => { setActivePage(p); if (isMobile) setSidebarOpen(false); }}
+        />
+        <NavItem
+          icon={<FlaskConical className="w-[18px] h-[18px]" strokeWidth={1.5} />}
+          label="Pesquisa de Mercado"
+          active={activePage === 'market-research'}
+          onClick={() => { setActivePage('market-research'); if (isMobile) setSidebarOpen(false); }}
         />
         <NavItem
           icon={<Newspaper className="w-[18px] h-[18px]" strokeWidth={1.5} />}
